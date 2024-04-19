@@ -1,10 +1,13 @@
-implement client
-  ☐ start project
-  ☐ dockerize
-implement server
-  ☐ listen to specified port
-  ☐ dockerize
-implement common
-  ☐ make common project
-  ☐ make common message format
+
+☐ start project
+☐ dockerize client
+☐ make look and feel
+☐ implement input
+☐ implement los
+☐ implement connected vs not connected state
+☐ implement server
+☐ listen to specified port
+☐ dockerize server
+☐ make common project
+☐ make common message format
   

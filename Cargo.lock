@@ -145,6 +145,13 @@ checksum = "baf1de4339761588bc0619e3cbc0120ee582ebb74b53b4efbf79117bd2da40fd"
 [[package]]
 name = "client"
 version = "0.1.0"
+dependencies = [
+ "shared",
+]
+
+[[package]]
+name = "client"
+version = "0.1.0"
 source = "git+https://github.com/horup/netcode-rs.git#ac32775604e9dd49f191090d6c38f5cf1b942b8f"
 dependencies = [
  "bincode",
@@ -673,7 +680,7 @@ name = "netcode"
 version = "0.1.0"
 source = "git+https://github.com/horup/netcode-rs.git#ac32775604e9dd49f191090d6c38f5cf1b942b8f"
 dependencies = [
- "client",
+ "client 0.1.0 (git+https://github.com/horup/netcode-rs.git)",
  "common",
  "server 0.1.0 (git+https://github.com/horup/netcode-rs.git)",
 ]
@@ -946,6 +953,7 @@ dependencies = [
  "endlessgrid",
  "netcode",
  "serde",
+ "shared",
  "slotmap",
  "tiled",
  "tokio",
@@ -977,6 +985,14 @@ dependencies = [
  "cfg-if",
  "cpufeatures",
  "digest",
+]
+
+[[package]]
+name = "shared"
+version = "0.1.0"
+dependencies = [
+ "netcode",
+ "serde",
 ]
 
 [[package]]
