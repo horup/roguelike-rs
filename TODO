@@ -1,0 +1,10 @@
+implement client
+  ☐ start project
+  ☐ dockerize
+implement server
+  ☐ listen to specified port
+  ☐ dockerize
+implement common
+  ☐ make common project
+  ☐ make common message format
+  
