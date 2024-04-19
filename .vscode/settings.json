@@ -1,2 +1,3 @@
 {
+    "rust-analyzer.cargo.targetDir": "target2"
 }
