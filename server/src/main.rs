@@ -1,7 +1,8 @@
-use std::collections::HashMap;
+use std::{collections::HashMap, time::Duration};
 
 use endlessgrid::Grid;
 use netcode::server::Server;
+use shared::Message;
 use slotmap::{DefaultKey, SlotMap};
 use tiled::Loader;
 
@@ -66,5 +67,22 @@ async fn main() {
     let mut entities = Default::default();
     load_map(&mut grid, &mut entities);
 
-    let server = Server::default() as Server<String>;
+    let mut server = Server::default() as Server<Message>;
+    server.start(8080).await;
+    loop {
+        for e in server.poll().iter() {
+            match e {
+                netcode::server::Event::ClientConnected { client_id } => {
+                    println!("client connected");
+                },
+                netcode::server::Event::ClientDisconnected { client_id } => {
+                    println!("client disconnected");
+                },
+                netcode::server::Event::Message { client_id, msg } => {
+
+                },
+            }
+        }
+        tokio::time::sleep(Duration::from_millis(10)).await;
+    }
 }

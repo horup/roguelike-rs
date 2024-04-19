@@ -4,11 +4,36 @@
 		{
 			"type": "cargo",
 			"command": "run",
-			"args": ["--bin", "server"],
+			"args": [
+				"--bin",
+				"server"
+			],
 			"problemMatcher": [
 				"$rustc"
 			],
 			"label": "run server"
+		},
+		{
+			"type": "cargo",
+			"command": "run",
+			"args": [
+				"--bin",
+				"client"
+			],
+			"problemMatcher": [
+				"$rustc"
+			],
+			"label": "run client"
+		},
+		{
+			"label": "run both",
+			"dependsOrder": "parallel",
+			"dependsOn": [
+				"run server",
+				"run client"
+			],
+			
+			"problemMatcher": []
 		}
 	]
 }

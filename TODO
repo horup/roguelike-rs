@@ -10,4 +10,7 @@
 ☐ dockerize server
 ☐ make common project
 ☐ make common message format
-  
+☐ run two apps at the same time to ease debugging
+☐ ensure client can run in a browser
+☐ add proper tick handling on server
+☐ remove hardcoded client connection url from client

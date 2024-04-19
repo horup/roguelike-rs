@@ -5,3 +5,6 @@ edition = "2021"
 
 [dependencies]
 shared = {path = "../shared"}
+bevy.workspace = true
+netcode.workspace = true
+serde.workspace = true
