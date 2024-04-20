@@ -1,19 +1,22 @@
-//! Renders a 2D scene containing a single, moving sprite.
-
 use std::sync::Mutex;
 use bevy::prelude::*;
 use shared::Message;
+use uuid::Uuid;
 
 #[derive(Resource)]
-pub struct Client {
+pub struct Player {
+    pub id:Uuid,
+    pub name:String,
     pub client:Mutex<netcode::client::Client<Message>>
 }
 
 fn main() {
     App::new()
         .add_plugins(DefaultPlugins)
-        .insert_resource(Client {
-            client:Mutex::new(Default::default())
+        .insert_resource(Player {
+            client:Mutex::new(Default::default()),
+            id:Uuid::new_v4(),
+            name:"Player".to_owned()
         })
         .add_systems(Startup, setup)
         .add_systems(Update, update)
@@ -26,7 +29,7 @@ enum Direction {
     Down,
 }
 
-fn setup(mut commands: Commands, asset_server: Res<AssetServer>, client:ResMut<Client>) {
+fn setup(mut commands: Commands, asset_server: Res<AssetServer>, client:ResMut<Player>) {
     client.client.lock().unwrap().connect("ws://localhost:8080");
     commands.spawn(Camera2dBundle::default());
     commands.spawn((
@@ -39,17 +42,14 @@ fn setup(mut commands: Commands, asset_server: Res<AssetServer>, client:ResMut<C
     ));
 }
 
-/// The sprite is animated by changing its translation depending on the time that has passed since
-/// the last frame.
-fn update(time: Res<Time>, mut sprite_position: Query<(&mut Direction, &mut Transform)>, client:ResMut<Client>) {
-    let mut client = client.client.lock().unwrap();
+fn update(time: Res<Time>, mut sprite_position: Query<(&mut Direction, &mut Transform)>, player:ResMut<Player>) {
+    let mut client = player.client.lock().unwrap();
     for e in client.poll() {
         match e {
             netcode::client::Event::Connecting => {
-
             },
             netcode::client::Event::Connected => {
-
+                client.send(Message::JoinAsPlayer { id: player.id, name: player.name.clone() });
             },
             netcode::client::Event::Disconnected => {
 

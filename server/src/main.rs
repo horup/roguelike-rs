@@ -1,14 +1,28 @@
 use std::{collections::HashMap, time::Duration};
 
 use endlessgrid::Grid;
+use log::info;
 use netcode::server::Server;
 use shared::Message;
 use slotmap::{DefaultKey, SlotMap};
 use tiled::Loader;
+use uuid::Uuid;
 
 #[derive(Clone, Default)]
-pub struct Tile {}
-pub struct Entity {}
+pub struct Tile {
+    pub wall:bool
+}
+pub struct Entity {
+
+}
+pub struct Player {
+
+}
+pub struct State {
+    pub grid:Grid<Tile>,
+    pub entities:SlotMap<DefaultKey, Entity>,
+    pub players:HashMap<Uuid, Player>
+}
 
 fn load_map(grid: &mut Grid<Tile>, _entities: &mut SlotMap<DefaultKey, Entity>) {
     let mut loader = Loader::new();
@@ -37,6 +51,15 @@ fn load_map(grid: &mut Grid<Tile>, _entities: &mut SlotMap<DefaultKey, Entity>) 
                         let classes = classes.split(' ').map(|x| (x.to_owned(), ()));
                         let classes: HashMap<String, ()> = classes.collect();
                         //let mut keys = HashMap::default();
+                        let mut tile = Tile::default();
+                        if classes.contains_key("tile") {
+                            if classes.contains_key("wall") {
+                                tile.wall = true;
+                            }
+                        }
+                        if classes.contains_key("entity") {
+
+                        }
                         if classes.contains_key("player") {
                             /*  let key = entities.insert(Entity {
                                 index:tile.id() as u16,
@@ -47,12 +70,7 @@ fn load_map(grid: &mut Grid<Tile>, _entities: &mut SlotMap<DefaultKey, Entity>) 
                         }
 
                         grid.insert(
-                            tile_pos,
-                            Tile {
-                           /* index:if classes.contains_key("entity") { 0 } else { tile.id() as u16 },
-                            solid:classes.contains_key("solid"),
-                            entities:keys*/
-                        },
+                            tile_pos, tile
                         );
                     }
                 }
@@ -63,23 +81,32 @@ fn load_map(grid: &mut Grid<Tile>, _entities: &mut SlotMap<DefaultKey, Entity>) 
 
 #[tokio::main]
 async fn main() {
-    let mut grid = Grid::default();
-    let mut entities = Default::default();
-    load_map(&mut grid, &mut entities);
-
+    env_logger::init();
+    let mut state = State {
+      grid:Default::default(),
+      entities:Default::default(),
+      players:Default::default()  
+    };
+    load_map(&mut state.grid, &mut state.entities);
+    let port = 8080;
+    info!("Starting server on port {}", port);
     let mut server = Server::default() as Server<Message>;
-    server.start(8080).await;
+    server.start(port).await;
     loop {
         for e in server.poll().iter() {
             match e {
                 netcode::server::Event::ClientConnected { client_id } => {
-                    println!("client connected");
+                    //println!("client connected");
                 },
                 netcode::server::Event::ClientDisconnected { client_id } => {
-                    println!("client disconnected");
+                    //println!("client disconnected");
                 },
                 netcode::server::Event::Message { client_id, msg } => {
-
+                    match msg {
+                        Message::JoinAsPlayer { id, name } => {
+                            info!("Player '{}' joined with id {}", name, id);
+                        },
+                    }
                 },
             }
         }

@@ -6,3 +6,4 @@ edition = "2021"
 [dependencies]
 netcode.workspace = true
 serde.workspace = true
+uuid.workspace = true

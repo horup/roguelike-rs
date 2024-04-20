@@ -4,6 +4,9 @@
 		{
 			"type": "cargo",
 			"command": "run",
+			"env": {
+				"RUST_LOG":"INFO"
+			},
 			"args": [
 				"--bin",
 				"server"
@@ -29,8 +32,8 @@
 			"label": "run both",
 			"dependsOrder": "parallel",
 			"dependsOn": [
-				"run server",
-				"run client"
+				"run client",
+				"run server"
 			],
 			
 			"problemMatcher": []

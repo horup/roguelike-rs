@@ -8,3 +8,4 @@ shared = {path = "../shared"}
 bevy.workspace = true
 netcode.workspace = true
 serde.workspace = true
+uuid.workspace = true

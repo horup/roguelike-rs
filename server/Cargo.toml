@@ -11,3 +11,6 @@ serde.workspace = true
 endlessgrid.workspace = true
 tiled.workspace = true
 slotmap.workspace = true
+uuid.workspace = true
+env_logger.workspace = true
+log.workspace = true
