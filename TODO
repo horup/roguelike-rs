@@ -18,3 +18,7 @@
 ☐ implement player spawning when joining
 ☐ implement movement of player
 ☐ implement rendering of what player sees
+☐ draw some tiles and player sprite
+☐ implement quick rendering of whole map
+☐ implement camera movement using wasd
+☐ implement mouse highlight of tile
