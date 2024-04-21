@@ -1,7 +1,10 @@
 use std::sync::Mutex;
-use bevy::prelude::*;
+use bevy::{prelude::*, render::{settings::{Backends, WgpuSettings}, RenderPlugin}};
 use shared::Message;
 use uuid::Uuid;
+
+#[derive(Component)]
+pub struct CenterText;
 
 #[derive(Resource)]
 pub struct Player {
@@ -12,7 +15,13 @@ pub struct Player {
 
 fn main() {
     App::new()
-        .add_plugins(DefaultPlugins)
+        .add_plugins(DefaultPlugins.set(RenderPlugin {
+            render_creation:bevy::render::settings::RenderCreation::Automatic(WgpuSettings {
+                backends:Some(Backends::VULKAN),
+                ..Default::default()
+            }),
+            ..Default::default()
+        }))
         .insert_resource(Player {
             client:Mutex::new(Default::default()),
             id:Uuid::new_v4(),
@@ -40,19 +49,29 @@ fn setup(mut commands: Commands, asset_server: Res<AssetServer>, client:ResMut<P
         },
         Direction::Up,
     ));
+
+    commands.spawn(Text2dBundle {
+        text:Text::from_section("", TextStyle {
+            font_size:64.0,
+            ..Default::default()
+        }),
+        ..Default::default()
+    }).insert(CenterText);
 }
 
-fn update(time: Res<Time>, mut sprite_position: Query<(&mut Direction, &mut Transform)>, player:ResMut<Player>) {
+fn update(time: Res<Time>, mut sprite_position: Query<(&mut Direction, &mut Transform)>, player:ResMut<Player>, mut center_text:Query<&mut Text, With<CenterText>>) {
     let mut client = player.client.lock().unwrap();
     for e in client.poll() {
         match e {
             netcode::client::Event::Connecting => {
+                center_text.single_mut().sections[0] = "Connecting...".into();
             },
             netcode::client::Event::Connected => {
                 client.send(Message::JoinAsPlayer { id: player.id, name: player.name.clone() });
+                center_text.single_mut().sections[0] = "".into();
             },
             netcode::client::Event::Disconnected => {
-
+                center_text.single_mut().sections[0] = "Lost connection to server!".into();
             },
             netcode::client::Event::Message(_) => {
                 

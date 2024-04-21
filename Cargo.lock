@@ -3640,6 +3640,7 @@ version = "0.1.0"
 dependencies = [
  "endlessgrid",
  "env_logger",
+ "glam 0.27.0",
  "log",
  "netcode",
  "serde",

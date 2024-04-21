@@ -1,6 +1,7 @@
 use std::{collections::HashMap, time::Duration};
 
 use endlessgrid::Grid;
+use glam::IVec2;
 use log::info;
 use netcode::server::Server;
 use shared::Message;
@@ -13,7 +14,7 @@ pub struct Tile {
     pub wall:bool
 }
 pub struct Entity {
-
+    pub pos:IVec2
 }
 pub struct Player {
 
@@ -22,6 +23,11 @@ pub struct State {
     pub grid:Grid<Tile>,
     pub entities:SlotMap<DefaultKey, Entity>,
     pub players:HashMap<Uuid, Player>
+}
+impl State {
+    pub fn spawn_entity(&mut self, entity:Entity) -> DefaultKey {
+        self.entities.insert(entity)
+    }
 }
 
 fn load_map(grid: &mut Grid<Tile>, _entities: &mut SlotMap<DefaultKey, Entity>) {
