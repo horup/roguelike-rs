@@ -40,19 +40,30 @@ enum Direction {
 
 fn setup(mut commands: Commands, asset_server: Res<AssetServer>, client:ResMut<Player>) {
     client.client.lock().unwrap().connect("ws://localhost:8080");
-    commands.spawn(Camera2dBundle::default());
-    commands.spawn((
-        SpriteBundle {
-            texture: asset_server.load("branding/icon.png"),
-            transform: Transform::from_xyz(100., 0., 0.),
-            ..default()
+    commands.spawn(Camera2dBundle {
+        projection:OrthographicProjection {
+            near:-1000.0,
+            far:1000.0,
+            scaling_mode:bevy::render::camera::ScalingMode::WindowSize(2.0),
+            ..Default::default()
         },
-        Direction::Up,
-    ));
+        ..Default::default()
+    });
+
+    for x in 0..100 {
+        commands.spawn((
+            SpriteBundle {
+                texture: asset_server.load("imgs/player.png"),
+                ..default()
+            },
+            Direction::Up,
+        ));
+    }
+   
 
     commands.spawn(Text2dBundle {
         text:Text::from_section("", TextStyle {
-            font_size:64.0,
+            font_size:16.0,
             ..Default::default()
         }),
         ..Default::default()
@@ -76,18 +87,6 @@ fn update(time: Res<Time>, mut sprite_position: Query<(&mut Direction, &mut Tran
             netcode::client::Event::Message(_) => {
                 
             },
-        }
-    }
-    for (mut logo, mut transform) in &mut sprite_position {
-        match *logo {
-            Direction::Up => transform.translation.y += 150. * time.delta_seconds(),
-            Direction::Down => transform.translation.y -= 150. * time.delta_seconds(),
-        }
-
-        if transform.translation.y > 200. {
-            *logo = Direction::Down;
-        } else if transform.translation.y < -200. {
-            *logo = Direction::Up;
         }
     }
 }
