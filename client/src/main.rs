@@ -119,6 +119,7 @@ fn cursor(
 fn update(
     player: ResMut<Player>,
     mut center_text: Query<&mut Text, With<CenterText>>,
+    mut commands:Commands
 ) {
     let mut client = player.client.lock().unwrap();
     for e in client.poll() {
@@ -136,7 +137,14 @@ fn update(
             netcode::client::Event::Disconnected => {
                 center_text.single_mut().sections[0] = "Lost connection to server!".into();
             }
-            netcode::client::Event::Message(_) => {}
+            netcode::client::Event::Message(msg) => {
+                match msg {
+                    Message::JoinAsPlayer { id, name } => {},
+                    Message::TileVisible { pos, wall } => {
+                        dbg!(pos);
+                    },
+                }
+            }
         }
     }
 }

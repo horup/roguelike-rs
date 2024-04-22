@@ -1,3 +1,4 @@
+use glam::IVec2;
 use serde::{Deserialize, Serialize};
 use uuid::Uuid;
 
@@ -8,6 +9,13 @@ pub enum Message {
         id:Uuid,
         /// self chosen name of the player
         name:String
+    },
+    TileVisible {
+        /// pos of the tile
+        pos:IVec2,
+
+        /// if the tile is a wall
+        wall:bool
     }
 }
 //impl netcode::Msg for Message {};

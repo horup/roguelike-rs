@@ -11,21 +11,19 @@ use uuid::Uuid;
 
 #[derive(Clone, Default)]
 pub struct Tile {
-    pub wall:bool
+    pub wall: bool,
 }
 pub struct Entity {
-    pub pos:IVec2
+    pub pos: IVec2,
 }
-pub struct Player {
-
-}
+pub struct Player {}
 pub struct State {
-    pub grid:Grid<Tile>,
-    pub entities:SlotMap<DefaultKey, Entity>,
-    pub players:HashMap<Uuid, Player>
+    pub grid: Grid<Tile>,
+    pub entities: SlotMap<DefaultKey, Entity>,
+    pub players: HashMap<Uuid, Player>,
 }
 impl State {
-    pub fn spawn_entity(&mut self, entity:Entity) -> DefaultKey {
+    pub fn spawn_entity(&mut self, entity: Entity) -> DefaultKey {
         self.entities.insert(entity)
     }
 }
@@ -63,9 +61,7 @@ fn load_map(grid: &mut Grid<Tile>, _entities: &mut SlotMap<DefaultKey, Entity>) 
                                 tile.wall = true;
                             }
                         }
-                        if classes.contains_key("entity") {
-
-                        }
+                        if classes.contains_key("entity") {}
                         if classes.contains_key("player") {
                             /*  let key = entities.insert(Entity {
                                 index:tile.id() as u16,
@@ -75,9 +71,7 @@ fn load_map(grid: &mut Grid<Tile>, _entities: &mut SlotMap<DefaultKey, Entity>) 
                             keys.insert(key, ());*/
                         }
 
-                        grid.insert(
-                            tile_pos, tile
-                        );
+                        grid.insert(tile_pos, tile);
                     }
                 }
             }
@@ -89,9 +83,9 @@ fn load_map(grid: &mut Grid<Tile>, _entities: &mut SlotMap<DefaultKey, Entity>) 
 async fn main() {
     env_logger::init();
     let mut state = State {
-      grid:Default::default(),
-      entities:Default::default(),
-      players:Default::default()  
+        grid: Default::default(),
+        entities: Default::default(),
+        players: Default::default(),
     };
     load_map(&mut state.grid, &mut state.entities);
     let port = 8080;
@@ -103,16 +97,20 @@ async fn main() {
             match e {
                 netcode::server::Event::ClientConnected { client_id } => {
                     //println!("client connected");
-                },
+                }
                 netcode::server::Event::ClientDisconnected { client_id } => {
                     //println!("client disconnected");
-                },
-                netcode::server::Event::Message { client_id, msg } => {
-                    match msg {
-                        Message::JoinAsPlayer { id, name } => {
-                            info!("Player '{}' joined with id {}", name, id);
-                        },
+                }
+                netcode::server::Event::Message { client_id, msg } => match msg {
+                    Message::JoinAsPlayer { id, name } => {
+                        info!("Player '{}' joined with id {}", name, id);
+                        for chunk in &state.grid {
+                            for (i, tile) in chunk {
+                                server.send(client_id.to_owned(), Message::TileVisible { pos: i.into(), wall: tile.wall });
+                            }
+                        }
                     }
+                    Message::TileVisible { pos: _, wall: _ } => {},
                 },
             }
         }
