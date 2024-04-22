@@ -77,6 +77,8 @@ fn load_map(grid: &mut Grid<Tile>, _entities: &mut SlotMap<DefaultKey, Entity>) 
             }
         }
     }
+
+    
 }
 
 #[tokio::main]
@@ -88,6 +90,11 @@ async fn main() {
         players: Default::default(),
     };
     load_map(&mut state.grid, &mut state.entities);
+    for chunk in &state.grid {
+        for (i, tile) in chunk {
+            dbg!(i);
+        }
+    }
     let port = 8080;
     info!("Starting server on port {}", port);
     let mut server = Server::default() as Server<Message>;

@@ -22,3 +22,4 @@
 ☐ implement quick rendering of whole map
 ☐ implement camera movement using wasd
 ☐ implement mouse highlight of tile
+☐ fixed chunk iterator of grid

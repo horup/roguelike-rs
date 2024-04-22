@@ -1,8 +1,7 @@
 use bevy::{
     prelude::*,
     render::{
-        settings::{Backends, WgpuSettings},
-        RenderPlugin,
+        mesh::primitives, settings::{Backends, WgpuSettings}, RenderPlugin
     },
 };
 use shared::Message;
@@ -14,6 +13,11 @@ pub struct Ground;
 
 #[derive(Component)]
 pub struct CenterText;
+
+#[derive(Resource, Default)]
+pub struct CommonAssets {
+    pub block_mesh:Handle<Mesh>
+}
 
 #[derive(Resource)]
 pub struct Player {
@@ -36,7 +40,7 @@ fn main() {
             id: Uuid::new_v4(),
             name: "Player".to_owned(),
         })
-       
+        .insert_resource(CommonAssets::default())
         .add_systems(Startup, setup)
         .add_systems(Update, (cursor, update).chain())
         .run();
@@ -48,7 +52,9 @@ fn setup(
     client: ResMut<Player>,
     mut meshes: ResMut<Assets<Mesh>>,
     mut materials: ResMut<Assets<StandardMaterial>>,
+    mut common_assets:ResMut<CommonAssets>
 ) {
+    common_assets.block_mesh = meshes.add(Cuboid::new(1., 1., 1.));
     client.client.lock().unwrap().connect("ws://localhost:8080");
     commands.spawn(Camera2dBundle::default());
     commands.spawn(Camera3dBundle {
@@ -119,7 +125,8 @@ fn cursor(
 fn update(
     player: ResMut<Player>,
     mut center_text: Query<&mut Text, With<CenterText>>,
-    mut commands:Commands
+    mut commands:Commands,
+    ca:Res<CommonAssets>
 ) {
     let mut client = player.client.lock().unwrap();
     for e in client.poll() {
@@ -141,7 +148,11 @@ fn update(
                 match msg {
                     Message::JoinAsPlayer { id, name } => {},
                     Message::TileVisible { pos, wall } => {
-                        dbg!(pos);
+                        commands.spawn(PbrBundle {
+                            mesh:ca.block_mesh.clone(),
+                            transform:Transform::from_xyz(pos.x as f32, 0.5, pos.y as f32),
+                            ..Default::default()
+                        });
                     },
                 }
             }
