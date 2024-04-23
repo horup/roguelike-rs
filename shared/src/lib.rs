@@ -10,6 +10,9 @@ pub enum Message {
         /// self chosen name of the player
         name:String
     },
+    WelcomePlayer {
+        your_entity:u64
+    },
     TileVisible {
         /// pos of the tile
         pos:IVec2,

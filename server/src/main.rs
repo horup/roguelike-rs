@@ -2,10 +2,10 @@ use std::{collections::HashMap, time::Duration};
 
 use endlessgrid::Grid;
 use glam::IVec2;
-use log::info;
+use log::{error, info};
 use netcode::server::Server;
 use shared::Message;
-use slotmap::{DefaultKey, SlotMap};
+use slotmap::{DefaultKey, Key, SlotMap};
 use tiled::Loader;
 use uuid::Uuid;
 
@@ -15,8 +15,13 @@ pub struct Tile {
 }
 pub struct Entity {
     pub pos: IVec2,
+    pub classes:HashMap<String, ()>
 }
-pub struct Player {}
+
+#[derive(Default)]
+pub struct Player {
+    pub entity:Option<DefaultKey>
+}
 pub struct State {
     pub grid: Grid<Tile>,
     pub entities: SlotMap<DefaultKey, Entity>,
@@ -53,7 +58,7 @@ fn load_map(grid: &mut Grid<Tile>, _entities: &mut SlotMap<DefaultKey, Entity>) 
                             .clone()
                             .unwrap_or_default();
                         let classes = classes.split(' ').map(|x| (x.to_owned(), ()));
-                        let classes: HashMap<String, ()> = classes.collect();
+                        let mut classes: HashMap<String, ()> = classes.collect();
                         if classes.contains_key("tile") {
                             let mut tile = Tile::default();
                             if classes.contains_key("wall") {
@@ -62,12 +67,11 @@ fn load_map(grid: &mut Grid<Tile>, _entities: &mut SlotMap<DefaultKey, Entity>) 
                             grid.insert(tile_pos, tile);
                         }
                         if classes.contains_key("entity") {
-                            if classes.contains_key("player") {
-                               
-                            }
-                            if classes.contains_key("door") {
-                               
-                            }
+                            classes.remove("entity");
+                            let mut entity = Entity {
+                                classes:classes.clone(),
+                                pos:tile_pos.into()
+                            };
                         }
                     }
                 }
@@ -103,6 +107,33 @@ async fn main() {
                 netcode::server::Event::Message { client_id, msg } => match msg {
                     Message::JoinAsPlayer { id, name } => {
                         info!("Player '{}' joined with id {}", name, id);
+                        let mut player = match state.players.get_mut(id) {
+                            Some(player) => player,
+                            None => {
+                                state.players.insert(id.to_owned(), Player::default());
+                                state.players.get_mut(id).unwrap()
+                            },
+                        };
+                        if player.entity.is_none() {
+                            // spawn entity for player
+                            let player_spawn = state.entities.iter().filter(|x|x.1.classes.contains_key("spawn_player")).next();
+                            match player_spawn {
+                                Some(player_spawn) => {
+                                    let spawn_pos = player_spawn.1.pos;
+                                    let id = state.entities.insert(Entity {
+                                        pos:spawn_pos.clone(),
+                                        classes:Default::default()
+                                    });
+                                    player.entity = Some(id);
+                                    info!("Spawning player at {}", spawn_pos);
+                                    server.send(client_id.to_owned(), Message::WelcomePlayer { your_entity: id.data().as_ffi() });
+
+                                },
+                                None => {
+                                    error!("Cannot spawn player since 'player_spawn' is not found");
+                                },
+                            }
+                        }
                         for chunk in &state.grid {
                             for (i, tile) in chunk {
                                 server.send(client_id.to_owned(), Message::TileVisible { pos: i.into(), wall: tile.wall });
@@ -110,6 +141,7 @@ async fn main() {
                         }
                     }
                     Message::TileVisible { pos: _, wall: _ } => {},
+                    Message::WelcomePlayer { your_entity: _ } => {}
                 },
             }
         }

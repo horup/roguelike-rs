@@ -4,8 +4,8 @@
   <image source="tileset.png" width="256" height="256"/>
   <tile id="0" type="tile floor"/>
   <tile id="1" type="tile wall"/>
-  <tile id="2" type="entity player"/>
-  <tile id="3" type="entity zombie"/>
+  <tile id="2" type="entity spawn_player"/>
+  <tile id="3" type="entity spawn_zombie"/>
   <tile id="17" type="entity door"/>
  </tileset>
  <layer id="1" name="1" width="30" height="20">

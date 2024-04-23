@@ -20,6 +20,7 @@
 ☐ implement entity rendering
 ☐ implement mouse highlight of tile
 ☐ implement black area around walls
+☐ refactor server main pattern matches
 Archive:
   ✔ start project @done(24-04-20 20:56)
   ✔ make common project @done(24-04-20 20:56)

@@ -33,6 +33,11 @@ impl CommonAssets {
 pub struct Player {
     pub id: Uuid,
     pub name: String,
+    pub entityid:Option<u64>
+}
+
+#[derive(Resource)]
+pub struct Client {
     pub client: Mutex<netcode::client::Client<Message>>,
 }
 
@@ -46,9 +51,12 @@ fn main() {
             ..Default::default()
         }).set(ImagePlugin::default_nearest()))
         .insert_resource(Player {
-            client: Mutex::new(Default::default()),
             id: Uuid::new_v4(),
             name: "Player".to_owned(),
+            entityid:None
+        })
+        .insert_resource(Client {
+            client: Mutex::new(Default::default()),
         })
         .insert_resource(CommonAssets::default())
         .add_systems(Startup, setup)
@@ -59,7 +67,7 @@ fn main() {
 fn setup(
     mut commands: Commands,
     ass: Res<AssetServer>,
-    client: ResMut<Player>,
+    client: ResMut<Client>,
     mut meshes: ResMut<Assets<Mesh>>,
     mut materials: ResMut<Assets<StandardMaterial>>,
     mut ca:ResMut<CommonAssets>
@@ -151,12 +159,13 @@ fn cursor(
 }
 
 fn update(
-    player: ResMut<Player>,
+    client: ResMut<Client>,
+    mut player: ResMut<Player>,
     mut center_text: Query<&mut Text, With<CenterText>>,
     mut commands:Commands,
     ca:Res<CommonAssets>
 ) {
-    let mut client = player.client.lock().unwrap();
+    let mut client = client.client.lock().unwrap();
     for e in client.poll() {
         match e {
             netcode::client::Event::Connecting => {
@@ -186,6 +195,9 @@ fn update(
                             transform,
                             ..Default::default()
                         });
+                    },
+                    Message::WelcomePlayer { your_entity } => {
+                        player.entityid = Some(your_entity);
                     },
                 }
             }
