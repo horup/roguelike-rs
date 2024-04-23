@@ -33,7 +33,7 @@ impl State {
     }
 }
 
-fn load_map(grid: &mut Grid<Tile>, _entities: &mut SlotMap<DefaultKey, Entity>) {
+fn load_map(grid: &mut Grid<Tile>, entities: &mut SlotMap<DefaultKey, Entity>) {
     let mut loader = Loader::new();
     let map = loader.load_tmx_map("assets/maps/basic.tmx").unwrap();
     for layer in map.layers() {
@@ -68,10 +68,11 @@ fn load_map(grid: &mut Grid<Tile>, _entities: &mut SlotMap<DefaultKey, Entity>) 
                         }
                         if classes.contains_key("entity") {
                             classes.remove("entity");
-                            let mut entity = Entity {
+                            let entity = Entity {
                                 classes:classes.clone(),
                                 pos:tile_pos.into()
                             };
+                            entities.insert(entity);
                         }
                     }
                 }
