@@ -17,6 +17,7 @@ pub struct CenterText;
 #[derive(Resource, Default)]
 pub struct CommonAssets {
     pub block_mesh:Handle<Mesh>,
+    pub floor_mesh:Handle<Mesh>,
     pub standard_materials:HashMap<String, Handle<StandardMaterial>>
 }
 impl CommonAssets {
@@ -64,6 +65,7 @@ fn setup(
     mut ca:ResMut<CommonAssets>
 ) {
     ca.block_mesh = meshes.add(Cuboid::new(1., 1., 1.));
+    ca.floor_mesh = meshes.add(Plane3d::default().mesh().size(1., 1.));
     let mut load = |name:&str, texture:&str| {
         let texture = texture.to_owned();
         ca.standard_materials.insert(name.to_owned(), ass.add(StandardMaterial {
@@ -170,9 +172,14 @@ fn update(
                 match msg {
                     Message::JoinAsPlayer { id, name } => {},
                     Message::TileVisible { pos, wall } => {
+                        let material = if wall { ca.standard_material("wall")} else {ca.standard_material("floor")};
+                        let mesh = if wall { ca.block_mesh.clone() } else { ca.floor_mesh.clone() };
+                        let y = if wall { 0.5 } else { 0.01 };
+                        let transform = Transform::from_xyz(pos.x as f32, y, pos.y as f32);
                         commands.spawn(PbrBundle {
-                            mesh:ca.block_mesh.clone(),
-                            transform:Transform::from_xyz(pos.x as f32, 0.5, pos.y as f32),
+                            mesh,
+                            material,
+                            transform,
                             ..Default::default()
                         });
                     },
