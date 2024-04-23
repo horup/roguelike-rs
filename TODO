@@ -23,4 +23,6 @@
 ☐ implement camera movement using wasd
 ☐ implement mouse highlight of tile
 ✔ fixed chunk iterator of grid @done(24-04-23 06:33)
-☐ fix layers in tmx loading 
+✔ fix layers in tmx loading @done(24-04-23 08:30)
+☐ make pixel perfect texture
+☐ implement black area around walls

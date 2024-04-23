@@ -107,7 +107,11 @@ fn setup(
     });
     commands.spawn(PbrBundle {
         mesh: meshes.add(Plane3d::default().mesh().size(64., 64.)),
-        material: materials.add(Color::rgb(0.3, 0.5, 0.3)),
+        material: materials.add(StandardMaterial {
+            base_color:Color::rgb(0., 0., 0.),
+            unlit:true,
+            ..Default::default()
+        }),
         ..default()
     }).insert(Ground);
 }

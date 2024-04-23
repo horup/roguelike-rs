@@ -54,24 +54,21 @@ fn load_map(grid: &mut Grid<Tile>, _entities: &mut SlotMap<DefaultKey, Entity>) 
                             .unwrap_or_default();
                         let classes = classes.split(' ').map(|x| (x.to_owned(), ()));
                         let classes: HashMap<String, ()> = classes.collect();
-                        //let mut keys = HashMap::default();
-                        let mut tile = Tile::default();
                         if classes.contains_key("tile") {
+                            let mut tile = Tile::default();
                             if classes.contains_key("wall") {
                                 tile.wall = true;
                             }
+                            grid.insert(tile_pos, tile);
                         }
-                        if classes.contains_key("entity") {}
-                        if classes.contains_key("player") {
-                            /*  let key = entities.insert(Entity {
-                                index:tile.id() as u16,
-                                pos:tile_pos.into(),
-                                is_player:true
-                            });
-                            keys.insert(key, ());*/
+                        if classes.contains_key("entity") {
+                            if classes.contains_key("player") {
+                               
+                            }
+                            if classes.contains_key("door") {
+                               
+                            }
                         }
-
-                        grid.insert(tile_pos, tile);
                     }
                 }
             }
