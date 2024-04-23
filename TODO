@@ -1,5 +1,4 @@
 
-✔ start project @done(24-04-20 20:56)
 ☐ dockerize client
 ☐ make look and feel
 ☐ implement input
@@ -8,9 +7,6 @@
 ☐ implement server
 ☐ listen to specified port
 ☐ dockerize server
-✔ make common project @done(24-04-20 20:56)
-✔ make common message format @done(24-04-20 20:56)
-✔ run two apps at the same time to ease debugging @done(24-04-20 20:56)
 ☐ ensure client can run in a browser
 ☐ add proper tick handling on server
 ☐ remove hardcoded client connection url from client
@@ -18,12 +14,18 @@
 ☐ implement player spawning when joining
 ☐ implement movement of player
 ☐ implement rendering of what player sees
-✔ draw some tiles and player sprite @done(24-04-22 08:57)
-☐ implement quick rendering of whole map
+✔ implement quick rendering of whole map @done(24-04-23 10:22)
 ☐ implement camera movement using wasd
+☐ implement camera rotation using qe
+☐ implement entity rendering
 ☐ implement mouse highlight of tile
-✔ fixed chunk iterator of grid @done(24-04-23 06:33)
-✔ fix layers in tmx loading @done(24-04-23 08:30)
-✔ make pixel perfect texture @done(24-04-23 09:03)
 ☐ implement black area around walls
 Archive:
+  ✔ start project @done(24-04-20 20:56)
+  ✔ make common project @done(24-04-20 20:56)
+  ✔ make common message format @done(24-04-20 20:56)
+  ✔ run two apps at the same time to ease debugging @done(24-04-20 20:56)
+  ✔ draw some tiles and player sprite @done(24-04-22 08:57)
+  ✔ fixed chunk iterator of grid @done(24-04-23 06:33)
+  ✔ fix layers in tmx loading @done(24-04-23 08:30)
+  ✔ make pixel perfect texture @done(24-04-23 09:03)
