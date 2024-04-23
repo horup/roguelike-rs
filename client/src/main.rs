@@ -1,7 +1,7 @@
 use bevy::{
     prelude::*,
     render::{
-        mesh::primitives, settings::{Backends, WgpuSettings}, RenderPlugin
+        mesh::primitives, settings::{Backends, WgpuSettings}, texture::ImageSampler, RenderPlugin
     },
 };
 use shared::Message;
@@ -44,7 +44,7 @@ fn main() {
                 ..Default::default()
             }),
             ..Default::default()
-        }))
+        }).set(ImagePlugin::default_nearest()))
         .insert_resource(Player {
             client: Mutex::new(Default::default()),
             id: Uuid::new_v4(),
