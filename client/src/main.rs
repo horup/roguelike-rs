@@ -5,7 +5,7 @@ use bevy::{
     },
 };
 use shared::Message;
-use std::sync::Mutex;
+use std::{collections::HashMap, sync::Mutex};
 use uuid::Uuid;
 
 #[derive(Component)]
@@ -16,7 +16,16 @@ pub struct CenterText;
 
 #[derive(Resource, Default)]
 pub struct CommonAssets {
-    pub block_mesh:Handle<Mesh>
+    pub block_mesh:Handle<Mesh>,
+    pub standard_materials:HashMap<String, Handle<StandardMaterial>>
+}
+impl CommonAssets {
+    pub fn standard_material(&self, name:&str) -> Handle<StandardMaterial> {
+        if let Some(handle) = self.standard_materials.get(name) {
+            return handle.to_owned();
+        }
+        Default::default()
+    }
 }
 
 #[derive(Resource)]
@@ -48,13 +57,26 @@ fn main() {
 
 fn setup(
     mut commands: Commands,
-    _asset_server: Res<AssetServer>,
+    ass: Res<AssetServer>,
     client: ResMut<Player>,
     mut meshes: ResMut<Assets<Mesh>>,
     mut materials: ResMut<Assets<StandardMaterial>>,
-    mut common_assets:ResMut<CommonAssets>
+    mut ca:ResMut<CommonAssets>
 ) {
-    common_assets.block_mesh = meshes.add(Cuboid::new(1., 1., 1.));
+    ca.block_mesh = meshes.add(Cuboid::new(1., 1., 1.));
+    let mut load = |name:&str, texture:&str| {
+        let texture = texture.to_owned();
+        ca.standard_materials.insert(name.to_owned(), ass.add(StandardMaterial {
+            base_color_texture:Some(ass.load(texture)),
+            ..Default::default()
+        }));
+    };
+
+    load("floor", "imgs/floor.png");
+    load("wall", "imgs/wall.png");
+    load("player", "imgs/player.png");
+    load("door", "imgs/door.png");
+    
     client.client.lock().unwrap().connect("ws://localhost:8080");
     commands.spawn(Camera2dBundle::default());
     commands.spawn(Camera3dBundle {

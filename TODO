@@ -22,4 +22,5 @@
 ☐ implement quick rendering of whole map
 ☐ implement camera movement using wasd
 ☐ implement mouse highlight of tile
-☐ fixed chunk iterator of grid
+✔ fixed chunk iterator of grid @done(24-04-23 06:33)
+☐ fix layers in tmx loading 
