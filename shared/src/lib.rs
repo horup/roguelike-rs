@@ -1,6 +1,7 @@
 use glam::IVec2;
 use serde::{Deserialize, Serialize};
 use uuid::Uuid;
+use slotmap::DefaultKey;
 
 #[derive(Clone, Serialize, Deserialize)]
 pub enum Message {
@@ -22,7 +23,7 @@ pub enum Message {
     },
     ThingUpdate {
         /// id of the thing
-        id:u64,
+        id:DefaultKey,
 
         /// position of the thing
         pos:Option<IVec2>,

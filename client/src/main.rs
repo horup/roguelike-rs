@@ -26,7 +26,8 @@ pub struct CenterText;
 pub struct CommonAssets {
     pub block_mesh:Handle<Mesh>,
     pub floor_mesh:Handle<Mesh>,
-    pub standard_materials:HashMap<String, Handle<StandardMaterial>>
+    pub standard_materials:HashMap<String, Handle<StandardMaterial>>,
+    pub things:HashMap<u64, Entity>
 }
 impl CommonAssets {
     pub fn standard_material(&self, name:&str) -> Handle<StandardMaterial> {
@@ -207,7 +208,16 @@ fn update(
                     Message::WelcomePlayer { your_entity } => {
                         player.entityid = Some(your_entity);
                     },
-                    Message::ThingUpdate { id, pos, classes, visible: visibility } => {
+                    Message::ThingUpdate { id, pos, classes, visible } => {
+                        /*let entity = match ca.things.get(&id) {
+                            Some(entity) => *entity,
+                            None => commands.spawn(Thing {
+                                id,
+                                classes: classes.unwrap_or_default(),
+                                pos: pos.unwrap_or_default(),
+                                visible: visibility.unwrap_or_default(),
+                            }),
+                        };*/
                         /*match things.iter_mut().filter(|x|x.id == id).next() {
                             Some(thing) => {
 

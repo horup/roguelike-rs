@@ -8,3 +8,4 @@ netcode.workspace = true
 serde.workspace = true
 uuid.workspace = true
 glam.workspace = true
+slotmap.workspace = true

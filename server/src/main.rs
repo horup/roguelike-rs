@@ -140,6 +140,11 @@ async fn main() {
                                 }
                             }
                         }
+
+                        for (id, thing) in &state.things {
+                            server.send(*client_id, Message::ThingUpdate { id: id, pos: Some(thing.pos), classes: Some(thing.classes.clone()), visible: Some(true) });
+                            server.send(*client_id, Message::ThingUpdate { id: id, pos: Some(thing.pos), classes: Some(thing.classes.clone()), visible: Some(true) });
+                        }
                     }
                     _ => {}
                 },
