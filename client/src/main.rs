@@ -9,6 +9,14 @@ use std::{collections::HashMap, sync::Mutex};
 use uuid::Uuid;
 
 #[derive(Component)]
+pub struct Thing {
+    pub id:u64,
+    pub classes:String,
+    pub pos:Vec2,
+    pub visible:bool
+}
+
+#[derive(Component)]
 pub struct Ground;
 
 #[derive(Component)]
@@ -163,6 +171,7 @@ fn update(
     mut player: ResMut<Player>,
     mut center_text: Query<&mut Text, With<CenterText>>,
     mut commands:Commands,
+    mut things:Query<&mut Thing>,
     ca:Res<CommonAssets>
 ) {
     let mut client = client.client.lock().unwrap();
@@ -183,7 +192,6 @@ fn update(
             }
             netcode::client::Event::Message(msg) => {
                 match msg {
-                    Message::JoinAsPlayer { id, name } => {},
                     Message::TileVisible { pos, wall } => {
                         let material = if wall { ca.standard_material("wall")} else {ca.standard_material("floor")};
                         let mesh = if wall { ca.block_mesh.clone() } else { ca.floor_mesh.clone() };
@@ -199,6 +207,17 @@ fn update(
                     Message::WelcomePlayer { your_entity } => {
                         player.entityid = Some(your_entity);
                     },
+                    Message::ThingUpdate { id, pos, classes, visible: visibility } => {
+                        /*match things.iter_mut().filter(|x|x.id == id).next() {
+                            Some(thing) => {
+
+                            },
+                            None => {
+                                commands.
+                            },
+                        };*/
+                    }
+                    _ => {}
                 }
             }
         }

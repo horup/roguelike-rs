@@ -19,6 +19,19 @@ pub enum Message {
 
         /// if the tile is a wall
         wall:bool
+    },
+    ThingUpdate {
+        /// id of the thing
+        id:u64,
+
+        /// position of the thing
+        pos:Option<IVec2>,
+
+        /// classes of the thing
+        classes:Option<String>,
+
+        /// if the thing is visible or not
+        visible:Option<bool>
     }
 }
 //impl netcode::Msg for Message {};

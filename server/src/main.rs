@@ -141,8 +141,7 @@ async fn main() {
                             }
                         }
                     }
-                    Message::TileVisible { pos: _, wall: _ } => {},
-                    Message::WelcomePlayer { your_entity: _ } => {}
+                    _ => {}
                 },
             }
         }
