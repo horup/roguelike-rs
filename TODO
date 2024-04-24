@@ -11,18 +11,19 @@
 ☐ add proper tick handling on server
 ☐ remove hardcoded client connection url from client
 ☐ implement join and rejoin
-✔ implement player spawning when joining @done(24-04-23 13:48)
 ☐ implement movement of player
 ☐ implement rendering of what player sees
-✔ implement quick rendering of whole map @done(24-04-23 10:22)
 ☐ implement camera movement using wasd
 ☐ implement camera rotation using qe
 ☐ implement entity rendering
 ☐ implement mouse highlight of tile
 ☐ implement black area around walls
 ☐ refactor server main pattern matches
-☐ implement better entity struct for server
+☐ !!! implement proper handling of new entities from server things and server tiles
 Archive:
+  ✔ implement player spawning when joining @done(24-04-23 13:48)
+  ✔ implement quick rendering of whole map @done(24-04-23 10:22)
+  ✔ implement better entity struct for server @done(24-04-24 15:02)
   ✔ start project @done(24-04-20 20:56)
   ✔ make common project @done(24-04-20 20:56)
   ✔ make common message format @done(24-04-20 20:56)
