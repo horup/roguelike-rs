@@ -13,27 +13,27 @@ use uuid::Uuid;
 pub struct Tile {
     pub wall: bool,
 }
-pub struct Entity {
+pub struct Thing {
     pub pos: IVec2,
-    pub classes:HashMap<String, ()>
+    pub classes:String
 }
 
 #[derive(Default)]
 pub struct Player {
-    pub entity:Option<DefaultKey>
+    pub thing:Option<DefaultKey>
 }
 pub struct State {
     pub grid: Grid<Tile>,
-    pub entities: SlotMap<DefaultKey, Entity>,
+    pub things: SlotMap<DefaultKey, Thing>,
     pub players: HashMap<Uuid, Player>,
 }
 impl State {
-    pub fn spawn_entity(&mut self, entity: Entity) -> DefaultKey {
-        self.entities.insert(entity)
+    pub fn spawn_entity(&mut self, entity: Thing) -> DefaultKey {
+        self.things.insert(entity)
     }
 }
 
-fn load_map(grid: &mut Grid<Tile>, entities: &mut SlotMap<DefaultKey, Entity>) {
+fn load_map(grid: &mut Grid<Tile>, entities: &mut SlotMap<DefaultKey, Thing>) {
     let mut loader = Loader::new();
     let map = loader.load_tmx_map("assets/maps/basic.tmx").unwrap();
     for layer in map.layers() {
@@ -57,18 +57,15 @@ fn load_map(grid: &mut Grid<Tile>, entities: &mut SlotMap<DefaultKey, Entity>) {
                             .user_type
                             .clone()
                             .unwrap_or_default();
-                        let classes = classes.split(' ').map(|x| (x.to_owned(), ()));
-                        let mut classes: HashMap<String, ()> = classes.collect();
-                        if classes.contains_key("tile") {
+                        if classes.contains("tile") {
                             let mut tile = Tile::default();
-                            if classes.contains_key("wall") {
+                            if classes.contains("wall") {
                                 tile.wall = true;
                             }
                             grid.insert(tile_pos, tile);
                         }
-                        if classes.contains_key("entity") {
-                            classes.remove("entity");
-                            let entity = Entity {
+                        if classes.contains("entity") {
+                            let entity = Thing {
                                 classes:classes.clone(),
                                 pos:tile_pos.into()
                             };
@@ -88,10 +85,10 @@ async fn main() {
     env_logger::init();
     let mut state = State {
         grid: Default::default(),
-        entities: Default::default(),
+        things: Default::default(),
         players: Default::default(),
     };
-    load_map(&mut state.grid, &mut state.entities);
+    load_map(&mut state.grid, &mut state.things);
     let port = 8080;
     info!("Starting server on port {}", port);
     let mut server = Server::default() as Server<Message>;
@@ -115,17 +112,17 @@ async fn main() {
                                 state.players.get_mut(id).unwrap()
                             },
                         };
-                        if player.entity.is_none() {
+                        if player.thing.is_none() {
                             // spawn entity for player
-                            let player_spawn = state.entities.iter().filter(|x|x.1.classes.contains_key("spawn_player")).next();
+                            let player_spawn = state.things.iter().filter(|x|x.1.classes.contains("spawn_player")).next();
                             match player_spawn {
                                 Some(player_spawn) => {
                                     let spawn_pos = player_spawn.1.pos;
-                                    let id = state.entities.insert(Entity {
+                                    let id = state.things.insert(Thing {
                                         pos:spawn_pos.clone(),
-                                        classes:Default::default()
+                                        classes:"player".to_owned()
                                     });
-                                    player.entity = Some(id);
+                                    player.thing = Some(id);
                                     info!("Spawning player at {}", spawn_pos);
                                     server.send(client_id.to_owned(), Message::WelcomePlayer { your_entity: id.data().as_ffi() });
 
@@ -137,7 +134,10 @@ async fn main() {
                         }
                         for chunk in &state.grid {
                             for (i, tile) in chunk {
-                                server.send(client_id.to_owned(), Message::TileVisible { pos: i.into(), wall: tile.wall });
+                                let r = server.send(client_id.to_owned(), Message::TileVisible { pos: i.into(), wall: tile.wall });
+                                if r == false {
+                                    dbg!("failed");
+                                }
                             }
                         }
                     }
