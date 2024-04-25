@@ -86,7 +86,7 @@ fn main() {
         .insert_resource(ServerState::default())
         .insert_resource(CommonAssets::default())
         .add_systems(Startup, setup)
-        .add_systems(Update, (cursor, update).chain())
+        .add_systems(Update, (poll_client, spawn_tile, cursor).chain())
         .run();
 }
 
@@ -184,13 +184,33 @@ fn cursor(
     );
 }
 
-fn update(
+fn spawn_tile(mut commands: Commands, mut st:ResMut<ServerState>, ca:Res<CommonAssets>) {
+    for chunk in &mut st.grid {
+        for (index, tile) in chunk {
+            if tile.entity.is_none() {
+                let wall = tile.wall;
+                let material = if wall { ca.standard_material("wall")} else {ca.standard_material("floor")};
+                let mesh = if wall { ca.block_mesh.clone() } else { ca.floor_mesh.clone() };
+                let y = if wall { 0.5 } else { 0.01 };
+                let pos:IVec2 = index.into();
+                let transform = Transform::from_xyz(pos.x as f32, y, pos.y as f32);
+                let id = commands.spawn(PbrBundle {
+                    mesh,
+                    material,
+                    transform,
+                    ..Default::default()
+                }).insert(tile.clone()).id();
+                tile.entity = Some(id);
+            }
+        }
+        
+    }
+}
+
+fn poll_client(
     client: ResMut<Client>,
     mut player: ResMut<Player>,
     mut center_text: Query<&mut Text, With<CenterText>>,
-  //  mut commands:Commands,
-  //  mut things:Query<&mut Thing>,
-  //  ca:Res<CommonAssets>,
     mut st:ResMut<ServerState>
 ) {
     let mut client = client.client.lock().unwrap();
@@ -244,7 +264,6 @@ fn update(
                                 st.things.get_mut(id).unwrap()
                             },
                         };
-
                     }
                     _ => {}
                 }
