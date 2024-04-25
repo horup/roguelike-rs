@@ -20,6 +20,8 @@
 ☐ implement black area around walls
 ☐ refactor server main pattern matches
 ☐ !!! implement proper handling of new entities from server things and server tiles
+☐ implement hasclass trait
+☐ implement metadata shared struct
 Archive:
   ✔ implement player spawning when joining @done(24-04-23 13:48)
   ✔ implement quick rendering of whole map @done(24-04-23 10:22)

@@ -10,3 +10,4 @@ netcode.workspace = true
 serde.workspace = true
 uuid.workspace = true
 slotmap.workspace = true
+endlessgrid.workspace = true

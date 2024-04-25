@@ -4,16 +4,26 @@ use bevy::{
         mesh::primitives, settings::{Backends, WgpuSettings}, texture::ImageSampler, RenderPlugin
     },
 };
+use endlessgrid::Grid;
 use shared::Message;
+use slotmap::{DefaultKey, SlotMap};
 use std::{collections::HashMap, sync::Mutex};
 use uuid::Uuid;
 
 #[derive(Component)]
 pub struct Thing {
-    pub id:u64,
+    pub entity:Option<Entity>,
     pub classes:String,
     pub pos:Vec2,
-    pub visible:bool
+    pub visible:bool,
+}
+
+#[derive(Component, Clone, Default)]
+pub struct Tile {
+    pub entity:Option<Entity>,
+    pub pos:IVec2,
+    pub wall:bool,
+    pub visible:bool,
 }
 
 #[derive(Component)]
@@ -27,8 +37,14 @@ pub struct CommonAssets {
     pub block_mesh:Handle<Mesh>,
     pub floor_mesh:Handle<Mesh>,
     pub standard_materials:HashMap<String, Handle<StandardMaterial>>,
-    pub things:HashMap<u64, Entity>
 }
+
+#[derive(Resource, Default)]
+pub struct ServerState {
+    pub things:SlotMap<DefaultKey, Thing>,
+    pub grid:Grid<Tile>
+}
+
 impl CommonAssets {
     pub fn standard_material(&self, name:&str) -> Handle<StandardMaterial> {
         if let Some(handle) = self.standard_materials.get(name) {
@@ -67,6 +83,7 @@ fn main() {
         .insert_resource(Client {
             client: Mutex::new(Default::default()),
         })
+        .insert_resource(ServerState::default())
         .insert_resource(CommonAssets::default())
         .add_systems(Startup, setup)
         .add_systems(Update, (cursor, update).chain())
@@ -171,9 +188,10 @@ fn update(
     client: ResMut<Client>,
     mut player: ResMut<Player>,
     mut center_text: Query<&mut Text, With<CenterText>>,
-    mut commands:Commands,
-    mut things:Query<&mut Thing>,
-    ca:Res<CommonAssets>
+  //  mut commands:Commands,
+  //  mut things:Query<&mut Thing>,
+  //  ca:Res<CommonAssets>,
+    mut st:ResMut<ServerState>
 ) {
     let mut client = client.client.lock().unwrap();
     for e in client.poll() {
@@ -194,7 +212,7 @@ fn update(
             netcode::client::Event::Message(msg) => {
                 match msg {
                     Message::TileVisible { pos, wall } => {
-                        let material = if wall { ca.standard_material("wall")} else {ca.standard_material("floor")};
+                        /*let material = if wall { ca.standard_material("wall")} else {ca.standard_material("floor")};
                         let mesh = if wall { ca.block_mesh.clone() } else { ca.floor_mesh.clone() };
                         let y = if wall { 0.5 } else { 0.01 };
                         let transform = Transform::from_xyz(pos.x as f32, y, pos.y as f32);
@@ -203,29 +221,21 @@ fn update(
                             material,
                             transform,
                             ..Default::default()
-                        });
+                        });*/
+                        let i:(i32, i32) = pos.into();
+                        let tile = match st.grid.get_mut(i) {
+                            Some(tile) => tile,
+                            None => {
+                                st.grid.insert(i, Default::default());
+                                st.grid.get_mut(i).unwrap()
+                            }
+                        };
+                        tile.wall = wall;
                     },
                     Message::WelcomePlayer { your_entity } => {
                         player.entityid = Some(your_entity);
                     },
                     Message::ThingUpdate { id, pos, classes, visible } => {
-                        /*let entity = match ca.things.get(&id) {
-                            Some(entity) => *entity,
-                            None => commands.spawn(Thing {
-                                id,
-                                classes: classes.unwrap_or_default(),
-                                pos: pos.unwrap_or_default(),
-                                visible: visibility.unwrap_or_default(),
-                            }),
-                        };*/
-                        /*match things.iter_mut().filter(|x|x.id == id).next() {
-                            Some(thing) => {
-
-                            },
-                            None => {
-                                commands.
-                            },
-                        };*/
                     }
                     _ => {}
                 }
