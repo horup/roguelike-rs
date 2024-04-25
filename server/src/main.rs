@@ -134,7 +134,7 @@ async fn main() {
                         }
                         for chunk in &state.grid {
                             for (i, tile) in chunk {
-                                let r = server.send(client_id.to_owned(), Message::TileVisible { pos: i.into(), wall: tile.wall });
+                                let r = server.send(client_id.to_owned(), Message::TileUpdate { pos: i.into(), wall: Some(tile.wall), visible:Some(true) });
                                 if r == false {
                                     dbg!("failed");
                                 }

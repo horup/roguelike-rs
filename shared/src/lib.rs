@@ -14,12 +14,13 @@ pub enum Message {
     WelcomePlayer {
         your_entity:u64
     },
-    TileVisible {
+    TileUpdate {
         /// pos of the tile
         pos:IVec2,
-
         /// if the tile is a wall
-        wall:bool
+        wall:Option<bool>,
+        /// if the tile is visible
+        visible:Option<bool>
     },
     ThingUpdate {
         /// id of the thing

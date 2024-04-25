@@ -10,7 +10,7 @@ use slotmap::{DefaultKey, SlotMap};
 use std::{collections::HashMap, sync::Mutex};
 use uuid::Uuid;
 
-#[derive(Component)]
+#[derive(Component, Default)]
 pub struct Thing {
     pub entity:Option<Entity>,
     pub classes:String,
@@ -211,7 +211,7 @@ fn update(
             }
             netcode::client::Event::Message(msg) => {
                 match msg {
-                    Message::TileVisible { pos, wall } => {
+                    Message::TileUpdate { pos, wall, visible } => {
                         /*let material = if wall { ca.standard_material("wall")} else {ca.standard_material("floor")};
                         let mesh = if wall { ca.block_mesh.clone() } else { ca.floor_mesh.clone() };
                         let y = if wall { 0.5 } else { 0.01 };
@@ -230,12 +230,21 @@ fn update(
                                 st.grid.get_mut(i).unwrap()
                             }
                         };
-                        tile.wall = wall;
+                        tile.wall = wall.unwrap_or(tile.wall);
+                        tile.visible = visible.unwrap_or(tile.visible);
                     },
                     Message::WelcomePlayer { your_entity } => {
                         player.entityid = Some(your_entity);
                     },
                     Message::ThingUpdate { id, pos, classes, visible } => {
+                        let thing = match st.things.get_mut(id) {
+                            Some(thing) => thing,
+                            None => {
+                                st.things.insert(Default::default());
+                                st.things.get_mut(id).unwrap()
+                            },
+                        };
+
                     }
                     _ => {}
                 }
