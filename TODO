@@ -19,9 +19,11 @@
 ☐ implement mouse highlight of tile
 ☐ implement black area around walls
 ☐ refactor server main pattern matches
-☐ !!! implement proper handling of new entities from server things and server tiles
+✔ !!! implement proper handling of new entities from server things and server tiles @done(24-04-26 11:19)
 ☐ implement hasclass trait
 ☐ implement metadata shared struct
+☐ implement door
+☐ implement better look of things
 Archive:
   ✔ implement player spawning when joining @done(24-04-23 13:48)
   ✔ implement quick rendering of whole map @done(24-04-23 10:22)

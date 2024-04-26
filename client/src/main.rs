@@ -86,7 +86,7 @@ fn main() {
         .insert_resource(ServerState::default())
         .insert_resource(CommonAssets::default())
         .add_systems(Startup, setup)
-        .add_systems(Update, (poll_client, spawn_tile, spawn_things, cursor).chain())
+        .add_systems(Update, (poll_client, spawn_tile, update_tile, spawn_things, update_things, cursor).chain())
         .run();
 }
 
@@ -184,41 +184,49 @@ fn cursor(
     );
 }
 
-fn spawn_things(mut commands: Commands, mut st:ResMut<ServerState>, ca:Res<CommonAssets>) {
+fn spawn_things(mut commands: Commands, mut st:ResMut<ServerState>) {
     for (_id, thing) in st.things.iter_mut() {
         if thing.entity.is_none() {
-            let transform = Transform::from_xyz(thing.pos.x as f32 + 0.5, 0.5, thing.pos.y as f32);
-            let material = ca.standard_material("player");
-            let mesh = ca.block_mesh.clone();
-            let id = commands.spawn(PbrBundle {
-                mesh,
-                material,
-                transform,
-                ..Default::default()
-            }).insert(thing.clone()).id();
+            let id = commands.spawn(PbrBundle::default()).insert(Thing::default()).id();
             thing.entity = Some(id);
         }
     }
 }
 
-fn spawn_tile(mut commands: Commands, mut st:ResMut<ServerState>, ca:Res<CommonAssets>) {
+fn update_things(mut q:Query<(&mut Thing, &mut Transform, &mut Handle<Mesh>, &mut Handle<StandardMaterial>)>, mut st:ResMut<ServerState>, ca:Res<CommonAssets>) {
+    for (_, thing) in st.things.iter_mut() {
+        let Some(entity) = thing.entity else { continue; };
+        let Ok((mut entity_thing, mut transform, mut mesh, mut material)) = q.get_mut(entity) else { continue;};
+        *mesh = ca.block_mesh.clone();
+        *material = ca.standard_material("player");
+        *transform = Transform::from_xyz(thing.pos.x as f32 + 0.5, 0.5, thing.pos.y as f32 + 0.5);
+        *entity_thing = thing.clone();
+    }
+}
+
+fn spawn_tile(mut commands: Commands, mut st:ResMut<ServerState>) {
     for chunk in &mut st.grid {
-        for (index, tile) in chunk {
+        for (_, tile) in chunk {
             if tile.entity.is_none() {
-                let wall = tile.wall;
-                let material = if wall { ca.standard_material("wall")} else {ca.standard_material("floor")};
-                let mesh = if wall { ca.block_mesh.clone() } else { ca.floor_mesh.clone() };
-                let y = if wall { 0.5 } else { 0.01 };
-                let pos:IVec2 = index.into();
-                let transform = Transform::from_xyz(pos.x as f32 + 0.5, y, pos.y as f32 + 0.5);
-                let id = commands.spawn(PbrBundle {
-                    mesh,
-                    material,
-                    transform,
-                    ..Default::default()
-                }).insert(tile.clone()).id();
+                let id = commands.spawn(PbrBundle::default()).insert(Tile::default()).id();
                 tile.entity = Some(id);
             }
+        }
+    }
+}
+
+fn update_tile(mut q:Query<(&mut Tile, &mut Transform, &mut Handle<Mesh>, &mut Handle<StandardMaterial>)>, mut st:ResMut<ServerState>, ca:Res<CommonAssets>) {
+    for chunk in &mut st.grid {
+        for (_, tile) in chunk {
+            let Some(entity) = tile.entity else { continue; };
+            let Ok((mut entity_tile, mut transform, mut mesh, mut material)) = q.get_mut(entity) else { continue; };
+            let wall = tile.wall;
+            *material = if wall { ca.standard_material("wall")} else {ca.standard_material("floor")};
+            *mesh = if wall { ca.block_mesh.clone() } else { ca.floor_mesh.clone() };
+            let y = if wall { 0.5 } else { 0.01 };
+            let pos:IVec2 = tile.pos;
+            *transform = Transform::from_xyz(pos.x as f32 + 0.5, y, pos.y as f32 + 0.5);
+            *entity_tile = tile.clone();
         }
     }
 }
@@ -248,16 +256,6 @@ fn poll_client(
             netcode::client::Event::Message(msg) => {
                 match msg {
                     Message::TileUpdate { pos, wall, visible } => {
-                        /*let material = if wall { ca.standard_material("wall")} else {ca.standard_material("floor")};
-                        let mesh = if wall { ca.block_mesh.clone() } else { ca.floor_mesh.clone() };
-                        let y = if wall { 0.5 } else { 0.01 };
-                        let transform = Transform::from_xyz(pos.x as f32, y, pos.y as f32);
-                        commands.spawn(PbrBundle {
-                            mesh,
-                            material,
-                            transform,
-                            ..Default::default()
-                        });*/
                         let i:(i32, i32) = pos.into();
                         let tile = match st.grid.get_mut(i) {
                             Some(tile) => tile,
@@ -266,6 +264,7 @@ fn poll_client(
                                 st.grid.get_mut(i).unwrap()
                             }
                         };
+                        tile.pos = pos;
                         tile.wall = wall.unwrap_or(tile.wall);
                         tile.visible = visible.unwrap_or(tile.visible);
                     },
