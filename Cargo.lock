@@ -2178,9 +2178,6 @@ name = "glam"
 version = "0.27.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "9e05e7e6723e3455f4818c7b26e855439f7546cf617ef669d1adedb8669e5cb9"
-dependencies = [
- "serde",
-]
 
 [[package]]
 name = "glob"
@@ -2928,7 +2925,7 @@ source = "git+https://github.com/horup/netcode-rs.git#6ae2fd2e202da9a5b4f6f72c1d
 dependencies = [
  "client 0.1.0 (git+https://github.com/horup/netcode-rs.git)",
  "common",
- "server 0.1.0 (git+https://github.com/horup/netcode-rs.git)",
+ "server",
 ]
 
 [[package]]
@@ -3504,6 +3501,23 @@ dependencies = [
 ]
 
 [[package]]
+name = "roguelike-server"
+version = "0.1.0"
+dependencies = [
+ "endlessgrid",
+ "env_logger",
+ "glam 0.25.0",
+ "log",
+ "netcode",
+ "serde",
+ "shared",
+ "slotmap",
+ "tiled",
+ "tokio",
+ "uuid",
+]
+
+[[package]]
 name = "ron"
 version = "0.8.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -3643,23 +3657,6 @@ dependencies = [
 [[package]]
 name = "server"
 version = "0.1.0"
-dependencies = [
- "endlessgrid",
- "env_logger",
- "glam 0.27.0",
- "log",
- "netcode",
- "serde",
- "shared",
- "slotmap",
- "tiled",
- "tokio",
- "uuid",
-]
-
-[[package]]
-name = "server"
-version = "0.1.0"
 source = "git+https://github.com/horup/netcode-rs.git#6ae2fd2e202da9a5b4f6f72c1dc26c14caf2c571"
 dependencies = [
  "bincode",
@@ -3698,7 +3695,7 @@ dependencies = [
 name = "shared"
 version = "0.1.0"
 dependencies = [
- "glam 0.27.0",
+ "glam 0.25.0",
  "netcode",
  "serde",
  "slotmap",

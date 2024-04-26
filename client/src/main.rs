@@ -10,11 +10,11 @@ use slotmap::{DefaultKey, SlotMap};
 use std::{collections::HashMap, sync::Mutex};
 use uuid::Uuid;
 
-#[derive(Component, Default)]
+#[derive(Component, Default, Clone)]
 pub struct Thing {
     pub entity:Option<Entity>,
     pub classes:String,
-    pub pos:Vec2,
+    pub pos:IVec2,
     pub visible:bool,
 }
 
@@ -86,7 +86,7 @@ fn main() {
         .insert_resource(ServerState::default())
         .insert_resource(CommonAssets::default())
         .add_systems(Startup, setup)
-        .add_systems(Update, (poll_client, spawn_tile, cursor).chain())
+        .add_systems(Update, (poll_client, spawn_tile, spawn_things, cursor).chain())
         .run();
 }
 
@@ -184,6 +184,23 @@ fn cursor(
     );
 }
 
+fn spawn_things(mut commands: Commands, mut st:ResMut<ServerState>, ca:Res<CommonAssets>) {
+    for (_id, thing) in st.things.iter_mut() {
+        if thing.entity.is_none() {
+            let transform = Transform::from_xyz(thing.pos.x as f32 + 0.5, 0.5, thing.pos.y as f32);
+            let material = ca.standard_material("player");
+            let mesh = ca.block_mesh.clone();
+            let id = commands.spawn(PbrBundle {
+                mesh,
+                material,
+                transform,
+                ..Default::default()
+            }).insert(thing.clone()).id();
+            thing.entity = Some(id);
+        }
+    }
+}
+
 fn spawn_tile(mut commands: Commands, mut st:ResMut<ServerState>, ca:Res<CommonAssets>) {
     for chunk in &mut st.grid {
         for (index, tile) in chunk {
@@ -193,7 +210,7 @@ fn spawn_tile(mut commands: Commands, mut st:ResMut<ServerState>, ca:Res<CommonA
                 let mesh = if wall { ca.block_mesh.clone() } else { ca.floor_mesh.clone() };
                 let y = if wall { 0.5 } else { 0.01 };
                 let pos:IVec2 = index.into();
-                let transform = Transform::from_xyz(pos.x as f32, y, pos.y as f32);
+                let transform = Transform::from_xyz(pos.x as f32 + 0.5, y, pos.y as f32 + 0.5);
                 let id = commands.spawn(PbrBundle {
                     mesh,
                     material,
@@ -203,7 +220,6 @@ fn spawn_tile(mut commands: Commands, mut st:ResMut<ServerState>, ca:Res<CommonA
                 tile.entity = Some(id);
             }
         }
-        
     }
 }
 
@@ -264,6 +280,8 @@ fn poll_client(
                                 st.things.get_mut(id).unwrap()
                             },
                         };
+                        thing.pos = pos.unwrap_or(thing.pos);
+                        thing.classes = classes.unwrap_or(thing.classes.clone());
                     }
                     _ => {}
                 }

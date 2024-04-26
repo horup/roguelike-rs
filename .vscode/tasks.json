@@ -9,7 +9,7 @@
 			},
 			"args": [
 				"--bin",
-				"server"
+				"roguelike-server"
 			],
 			"problemMatcher": [
 				"$rustc"
