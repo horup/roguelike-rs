@@ -37,3 +37,10 @@ pub enum Message {
     }
 }
 //impl netcode::Msg for Message {};
+
+pub trait HasClass {
+    fn classes(&self) -> &String;
+    fn has_class(&self, class_name:&str) -> bool {
+        self.classes().contains(class_name)
+    }
+}

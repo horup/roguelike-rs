@@ -5,7 +5,7 @@ use bevy::{
     },
 };
 use endlessgrid::Grid;
-use shared::Message;
+use shared::{HasClass, Message};
 use slotmap::{DefaultKey, SlotMap};
 use std::{collections::HashMap, sync::Mutex};
 use uuid::Uuid;
@@ -16,6 +16,11 @@ pub struct Thing {
     pub classes:String,
     pub pos:IVec2,
     pub visible:bool,
+}
+impl HasClass for Thing {
+    fn classes(&self) -> &String {
+        &self.classes
+    }
 }
 
 #[derive(Component, Clone, Default)]
@@ -156,7 +161,7 @@ fn setup(
 }
 
 fn camera_control(mut q:Query<(&mut CameraController, &mut Transform)>, keyboard_input:Res<ButtonInput<KeyCode>>, time:Res<Time>) {
-    let (controller, mut transform) = q.single_mut();
+    let (_controller, mut transform) = q.single_mut();
     let mut d = Vec3::default();
     if keyboard_input.pressed(KeyCode::KeyA) {
         d.x -= 1.0;
@@ -223,7 +228,12 @@ fn update_things(mut q:Query<(&mut Thing, &mut Transform, &mut Handle<Mesh>, &mu
         let Some(entity) = thing.entity else { continue; };
         let Ok((mut entity_thing, mut transform, mut mesh, mut material)) = q.get_mut(entity) else { continue;};
         *mesh = ca.block_mesh.clone();
-        *material = ca.standard_material("player");
+        if thing.has_class("player") {
+            *material = ca.standard_material("player");
+        }
+        if thing.has_class("door") {
+            *material = ca.standard_material("door");
+        }
         *transform = Transform::from_xyz(thing.pos.x as f32 + 0.5, 0.5, thing.pos.y as f32 + 0.5);
         *entity_thing = thing.clone();
     }
