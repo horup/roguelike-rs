@@ -44,6 +44,7 @@ pub struct CenterText;
 
 #[derive(Resource, Default)]
 pub struct CommonAssets {
+    pub thing_mesh:Handle<Mesh>,
     pub block_mesh:Handle<Mesh>,
     pub floor_mesh:Handle<Mesh>,
     pub standard_materials:HashMap<String, Handle<StandardMaterial>>,
@@ -108,6 +109,7 @@ fn setup(
     mut materials: ResMut<Assets<StandardMaterial>>,
     mut ca:ResMut<CommonAssets>
 ) {
+    ca.thing_mesh = meshes.add(Cuboid::new(1., 1., 0.01));
     ca.block_mesh = meshes.add(Cuboid::new(1., 1., 1.));
     ca.floor_mesh = meshes.add(Plane3d::default().mesh().size(1., 1.));
     let mut load = |name:&str, texture:&str| {
@@ -130,7 +132,7 @@ fn setup(
             order:-1,
             ..Default::default()
         },
-        transform: Transform::from_xyz(0.0, 15.0, 0.0).looking_at(Vec3::ZERO, -Vec3::Z),
+        transform: Transform::from_xyz(0.0, 7.0, 7.0).looking_at(Vec3::ZERO, -Vec3::Z),
         ..default()
     }).insert(CameraController::default());
     commands
@@ -227,7 +229,7 @@ fn update_things(mut q:Query<(&mut Thing, &mut Transform, &mut Handle<Mesh>, &mu
     for (_, thing) in st.things.iter_mut() {
         let Some(entity) = thing.entity else { continue; };
         let Ok((mut entity_thing, mut transform, mut mesh, mut material)) = q.get_mut(entity) else { continue;};
-        *mesh = ca.block_mesh.clone();
+        *mesh = ca.thing_mesh.clone();
         if thing.has_class("player") {
             *material = ca.standard_material("player");
         }
