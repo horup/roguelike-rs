@@ -2,6 +2,11 @@
 resolver = "2"
 members = [ "client","server", "shared"]
 
+[profile.dev.build-override]
+opt-level = 0
+codegen-units = 256
+debug = false
+
 [workspace.dependencies]
 tokio = {version = "1.37.0", features = ["full"]}
 netcode = {git = "https://github.com/horup/netcode-rs.git"}
