@@ -26,6 +26,11 @@ pub struct Tile {
     pub visible:bool,
 }
 
+#[derive(Component, Default)]
+pub struct CameraController {
+
+}
+
 #[derive(Component)]
 pub struct Ground;
 
@@ -86,7 +91,7 @@ fn main() {
         .insert_resource(ServerState::default())
         .insert_resource(CommonAssets::default())
         .add_systems(Startup, setup)
-        .add_systems(Update, (poll_client, spawn_tile, update_tile, spawn_things, update_things, cursor).chain())
+        .add_systems(Update, (poll_client, spawn_tile, update_tile, spawn_things, update_things, camera_control, cursor).chain())
         .run();
 }
 
@@ -120,9 +125,9 @@ fn setup(
             order:-1,
             ..Default::default()
         },
-        transform: Transform::from_xyz(15.0, 5.0, 15.0).looking_at(Vec3::ZERO, Vec3::Y),
+        transform: Transform::from_xyz(0.0, 15.0, 0.0).looking_at(Vec3::ZERO, -Vec3::Z),
         ..default()
-    });
+    }).insert(CameraController::default());
     commands
         .spawn(Text2dBundle {
             text: Text::from_section(
@@ -148,6 +153,26 @@ fn setup(
         }),
         ..default()
     }).insert(Ground);
+}
+
+fn camera_control(mut q:Query<(&mut CameraController, &mut Transform)>, keyboard_input:Res<ButtonInput<KeyCode>>, time:Res<Time>) {
+    let (controller, mut transform) = q.single_mut();
+    let mut d = Vec3::default();
+    if keyboard_input.pressed(KeyCode::KeyA) {
+        d.x -= 1.0;
+    }
+    if keyboard_input.pressed(KeyCode::KeyD) {
+        d.x += 1.0;
+    }
+    if keyboard_input.pressed(KeyCode::KeyW) {
+        d.z -= 1.0;
+    }
+    if keyboard_input.pressed(KeyCode::KeyS) {
+        d.z += 1.0;
+    }
+    let speed = 10.0;
+    let v = d * time.delta_seconds() * speed;
+    transform.translation += v;
 }
 
 fn cursor(

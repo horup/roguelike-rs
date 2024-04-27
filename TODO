@@ -13,7 +13,7 @@
 ☐ implement join and rejoin
 ☐ implement movement of player
 ☐ implement rendering of what player sees
-☐ implement camera movement using wasd
+✔ implement camera movement using wasd @done(24-04-27 08:41)
 ☐ implement camera rotation using qe
 ☐ implement entity rendering
 ☐ implement mouse highlight of tile
