@@ -132,7 +132,7 @@ fn setup(
             order:-1,
             ..Default::default()
         },
-        transform: Transform::from_xyz(0.0, 7.0, 7.0).looking_at(Vec3::ZERO, -Vec3::Z),
+        transform: Transform::from_xyz(0.0, 7.0, 7.0).looking_at(Vec3::ZERO, Vec3::Z),
         ..default()
     }).insert(CameraController::default());
     commands
@@ -158,6 +158,7 @@ fn setup(
             unlit:true,
             ..Default::default()
         }),
+        transform:Transform::default().looking_to(Vec3::Y, Vec3::Z),
         ..default()
     }).insert(Ground);
 }
@@ -172,10 +173,10 @@ fn camera_control(mut q:Query<(&mut CameraController, &mut Transform)>, keyboard
         d.x += 1.0;
     }
     if keyboard_input.pressed(KeyCode::KeyW) {
-        d.z -= 1.0;
+        d.y -= 1.0;
     }
     if keyboard_input.pressed(KeyCode::KeyS) {
-        d.z += 1.0;
+        d.y += 1.0;
     }
     let speed = 10.0;
     let v = d * time.delta_seconds() * speed;
@@ -236,7 +237,7 @@ fn update_things(mut q:Query<(&mut Thing, &mut Transform, &mut Handle<Mesh>, &mu
         if thing.has_class("door") {
             *material = ca.standard_material("door");
         }
-        *transform = Transform::from_xyz(thing.pos.x as f32 + 0.5, 0.5, thing.pos.y as f32 + 0.5);
+        *transform = Transform::from_xyz(thing.pos.x as f32 + 0.5, thing.pos.y as f32 + 0.5, 0.5);
         *entity_thing = thing.clone();
     }
 }
@@ -260,9 +261,9 @@ fn update_tile(mut q:Query<(&mut Tile, &mut Transform, &mut Handle<Mesh>, &mut H
             let wall = tile.wall;
             *material = if wall { ca.standard_material("wall")} else {ca.standard_material("floor")};
             *mesh = if wall { ca.block_mesh.clone() } else { ca.floor_mesh.clone() };
-            let y = if wall { 0.5 } else { 0.01 };
+            let z = if wall { 0.5 } else { 0.01 };
             let pos:IVec2 = tile.pos;
-            *transform = Transform::from_xyz(pos.x as f32 + 0.5, y, pos.y as f32 + 0.5);
+            *transform = Transform::from_xyz(pos.x as f32 + 0.5,pos.y as f32 + 0.5, z).looking_to(Vec3::Y, Vec3::Z);
             *entity_tile = tile.clone();
         }
     }
