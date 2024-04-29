@@ -1,7 +1,7 @@
 use bevy::{
     prelude::*,
     render::{
-        mesh::primitives, settings::{Backends, WgpuSettings}, texture::ImageSampler, RenderPlugin
+        camera::ScalingMode, mesh::primitives, settings::{Backends, WgpuSettings}, texture::ImageSampler, RenderPlugin
     },
 };
 use endlessgrid::Grid;
@@ -136,6 +136,10 @@ fn setup(
             order:-1,
             ..Default::default()
         },
+     /*    projection: Projection::Orthographic(OrthographicProjection {
+            scaling_mode: ScalingMode::FixedVertical(6.0),
+            ..default()
+        }),*/
         transform: Transform::from_xyz(0.0, 7.0, 7.0).looking_at(Vec3::ZERO, -Vec3::Z),
         ..default()
     }).insert(CameraController::default());
@@ -151,10 +155,6 @@ fn setup(
             ..Default::default()
         })
         .insert(CenterText);
-    commands.spawn(DirectionalLightBundle {
-        transform: Transform::from_translation(Vec3::ONE).looking_at(Vec3::ZERO, Vec3::Y),
-        ..default()
-    });
     commands.spawn(TransformBundle::default()).insert(Ground);
 }
 
@@ -229,10 +229,10 @@ fn update_things(mut q:Query<(&mut Thing, &mut Transform, &mut Handle<Mesh>, &mu
             *material = ca.standard_material("door");
         }
         let mut camera_pos = global_transform.translation().clone();
-        camera_pos.y = 1.0;
+        //camera_pos.y = 1.0;
         *transform = Transform::from_xyz(thing.pos.x as f32 + 0.5, 1.0, thing.pos.y as f32 + 0.5)
         .looking_at(camera_pos, Vec3::Y);
-        //.looking_to(Vec3::new(0.0, 0.0, 1.0), Vec3::new(0.0, 1.0, 0.0));
+       // .looking_to(Vec3::new(0.0, 0.0, 1.0), Vec3::new(0.0, 1.0, 0.0));
 
         *entity_thing = thing.clone();
     }
