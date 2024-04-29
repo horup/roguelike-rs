@@ -33,7 +33,6 @@ pub struct Tile {
 
 #[derive(Component, Default)]
 pub struct CameraController {
-
 }
 
 #[derive(Component)]
@@ -109,13 +108,16 @@ fn setup(
     mut materials: ResMut<Assets<StandardMaterial>>,
     mut ca:ResMut<CommonAssets>
 ) {
-    ca.thing_mesh = meshes.add(Cuboid::new(1., 1., 0.01));
+    //ca.thing_mesh = meshes.add(Cuboid::new(1., 1., 0.01));
+    ca.thing_mesh = meshes.add(Plane3d::default().mesh().size(1.0, 1.0).normal(Direction3d::Z));
     ca.block_mesh = meshes.add(Cuboid::new(1., 1., 1.));
     ca.floor_mesh = meshes.add(Plane3d::default().mesh().size(1., 1.));
     let mut load = |name:&str, texture:&str| {
         let texture = texture.to_owned();
         ca.standard_materials.insert(name.to_owned(), ass.add(StandardMaterial {
             base_color_texture:Some(ass.load(texture)),
+            cull_mode:None,
+            unlit:true,
             ..Default::default()
         }));
     };
@@ -234,7 +236,7 @@ fn update_things(mut q:Query<(&mut Thing, &mut Transform, &mut Handle<Mesh>, &mu
         if thing.has_class("door") {
             *material = ca.standard_material("door");
         }
-        *transform = Transform::from_xyz(thing.pos.x as f32 + 0.5, 0.5, thing.pos.y as f32 + 0.5);
+        *transform = Transform::from_xyz(thing.pos.x as f32 + 0.5, 0.5, thing.pos.y as f32 + 0.5).looking_to(Vec3::new(1.0, 0.0, 0.0), Vec3::new(0.0, 1.0, 0.0));//.looking_at(Vec3::new(0.0, 0.0, 1.0), Vec3::new(0.0, 1.0, 0.0));
         *entity_thing = thing.clone();
     }
 }
