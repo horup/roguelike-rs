@@ -153,15 +153,7 @@ fn setup(
         transform: Transform::from_translation(Vec3::ONE).looking_at(Vec3::ZERO, Vec3::Y),
         ..default()
     });
-    commands.spawn(PbrBundle {
-        mesh: meshes.add(Plane3d::default().mesh().size(64., 64.)),
-        material: materials.add(StandardMaterial {
-            base_color:Color::rgb(0., 0., 0.),
-            unlit:true,
-            ..Default::default()
-        }),
-        ..default()
-    }).insert(Ground);
+    commands.spawn(TransformBundle::default()).insert(Ground);
 }
 
 fn camera_control(mut q:Query<(&mut CameraController, &mut Transform)>, keyboard_input:Res<ButtonInput<KeyCode>>, time:Res<Time>) {
@@ -225,7 +217,8 @@ fn spawn_things(mut commands: Commands, mut st:ResMut<ServerState>) {
     }
 }
 
-fn update_things(mut q:Query<(&mut Thing, &mut Transform, &mut Handle<Mesh>, &mut Handle<StandardMaterial>)>, mut st:ResMut<ServerState>, ca:Res<CommonAssets>) {
+fn update_things(mut q:Query<(&mut Thing, &mut Transform, &mut Handle<Mesh>, &mut Handle<StandardMaterial>)>, mut st:ResMut<ServerState>, ca:Res<CommonAssets>, camera_query: Query<(&Camera, &GlobalTransform), With<Camera3d>>) {
+    let (_camera, global_transform) = camera_query.single();
     for (_, thing) in st.things.iter_mut() {
         let Some(entity) = thing.entity else { continue; };
         let Ok((mut entity_thing, mut transform, mut mesh, mut material)) = q.get_mut(entity) else { continue;};
@@ -236,7 +229,12 @@ fn update_things(mut q:Query<(&mut Thing, &mut Transform, &mut Handle<Mesh>, &mu
         if thing.has_class("door") {
             *material = ca.standard_material("door");
         }
-        *transform = Transform::from_xyz(thing.pos.x as f32 + 0.5, 0.5, thing.pos.y as f32 + 0.5).looking_to(Vec3::new(1.0, 0.0, 0.0), Vec3::new(0.0, 1.0, 0.0));//.looking_at(Vec3::new(0.0, 0.0, 1.0), Vec3::new(0.0, 1.0, 0.0));
+        let mut camera_pos = global_transform.translation().clone();
+        camera_pos.y = 0.5;
+        *transform = Transform::from_xyz(thing.pos.x as f32 + 0.5, 0.5, thing.pos.y as f32 + 0.5)
+        .looking_at(camera_pos, Vec3::Y);
+        //.looking_to(Vec3::new(1.0, 0.0, 0.0), Vec3::new(0.0, 1.0, 0.0));
+
         *entity_thing = thing.clone();
     }
 }
@@ -259,8 +257,9 @@ fn update_tile(mut q:Query<(&mut Tile, &mut Transform, &mut Handle<Mesh>, &mut H
             let Ok((mut entity_tile, mut transform, mut mesh, mut material)) = q.get_mut(entity) else { continue; };
             let wall = tile.wall;
             *material = if wall { ca.standard_material("wall")} else {ca.standard_material("floor")};
-            *mesh = if wall { ca.block_mesh.clone() } else { ca.floor_mesh.clone() };
-            let y = if wall { 0.5 } else { 0.01 };
+            *mesh = ca.floor_mesh.clone();//if wall { ca.block_mesh.clone() } else { ca.floor_mesh.clone() };
+            //let y = if wall { 0.5 } else { 0.01 };
+            let y = 0.0;
             let pos:IVec2 = tile.pos;
             *transform = Transform::from_xyz(pos.x as f32 + 0.5, y, pos.y as f32 + 0.5);
             *entity_tile = tile.clone();
