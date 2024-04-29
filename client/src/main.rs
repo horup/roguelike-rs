@@ -195,12 +195,10 @@ fn cursor(
     let Some(cursor_position) = windows.single().cursor_position() else {
         return;
     };
-
     // Calculate a ray pointing from the camera into the world based on the cursor's position.
     let Some(ray) = camera.viewport_to_world(camera_transform, cursor_position) else {
         return;
     };
-
     // Calculate if and where the ray is hitting the ground plane.
     let Some(distance) = ray.intersect_plane(ground.translation(), Plane3d::new(ground.up()))
     else {

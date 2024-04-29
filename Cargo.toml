@@ -3,9 +3,11 @@ resolver = "2"
 members = [ "client","server", "shared"]
 
 [profile.dev.build-override]
-opt-level = 0
+opt-level = 1
 codegen-units = 256
-debug = false
+
+[profile.dev.package."*"]
+opt-level = 3
 
 [workspace.dependencies]
 tokio = {version = "1.37.0", features = ["full"]}
@@ -14,7 +16,7 @@ endlessgrid = {git = "https://github.com/horup/endlessgrid-rs.git"}
 serde = {version = "1", features = ["derive"]}
 tiled = "0.11.2"
 slotmap = {version = "1.0.7", features = ["serde"]}
-bevy = "0.13.2"
+bevy = "=0.13.1"
 uuid = {version = "1.8.0", features = ["v4"]}
 log = "0.4.21"
 env_logger = "0.11.3"

@@ -21,7 +21,9 @@
 			"command": "run",
 			"args": [
 				"--bin",
-				"client"
+				"client",
+				"--features",
+				"bevy/dynamic_linking"
 			],
 			"problemMatcher": [
 				"$rustc"
