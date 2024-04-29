@@ -7,7 +7,7 @@ use bevy::{
 use endlessgrid::Grid;
 use shared::{HasClass, Message};
 use slotmap::{DefaultKey, SlotMap};
-use std::{collections::HashMap, sync::Mutex};
+use std::{collections::HashMap, f32::consts::PI, sync::Mutex};
 use uuid::Uuid;
 
 #[derive(Component, Default, Clone)]
@@ -90,6 +90,7 @@ fn main() {
             name: "Player".to_owned(),
             entityid:None
         })
+        .insert_resource(ClearColor(Color::rgb(0.0, 0.0, 0.0)))
         .insert_resource(Client {
             client: Mutex::new(Default::default()),
         })
@@ -109,7 +110,7 @@ fn setup(
     mut ca:ResMut<CommonAssets>
 ) {
     //ca.thing_mesh = meshes.add(Cuboid::new(1., 1., 0.01));
-    ca.thing_mesh = meshes.add(Plane3d::default().mesh().size(1.0, 1.0).normal(Direction3d::Z));
+    ca.thing_mesh = meshes.add(Plane3d::default().mesh().size(1.0, 2.0).normal(Direction3d::Z));
     ca.block_mesh = meshes.add(Cuboid::new(1., 1., 1.));
     ca.floor_mesh = meshes.add(Plane3d::default().mesh().size(1., 1.));
     let mut load = |name:&str, texture:&str| {
@@ -118,13 +119,14 @@ fn setup(
             base_color_texture:Some(ass.load(texture)),
             cull_mode:None,
             unlit:true,
+            alpha_mode:AlphaMode::Blend,
             ..Default::default()
         }));
     };
 
     load("floor", "imgs/floor.png");
     load("wall", "imgs/wall.png");
-    load("player", "imgs/player.png");
+    load("player", "imgs/fighter.png");
     load("door", "imgs/door.png");
     
     client.client.lock().unwrap().connect("ws://localhost:8080");
@@ -197,15 +199,12 @@ fn cursor(
     else {
         return;
     };
-    let point = ray.get_point(distance);
+    let point = ray.get_point(distance) - Vec3::new(0.5, 0.0, 0.5);
+    let pos = point.round();
 
-    // Draw a circle just above the ground plane at that position.
-    gizmos.circle(
-        point + ground.up() * 0.01,
-        Direction3d::new_unchecked(ground.up()), // Up vector is already normalized.
-        0.2,
-        Color::RED,
-    );
+    gizmos.rect(pos + ground.up() * 0.01 + Vec3::new(0.5, 0.0, 0.5), Quat::from_rotation_x(PI / 2.0), Vec2::new(1.0, 1.0), Color::RED);
+
+    
 }
 
 fn spawn_things(mut commands: Commands, mut st:ResMut<ServerState>) {
@@ -230,10 +229,10 @@ fn update_things(mut q:Query<(&mut Thing, &mut Transform, &mut Handle<Mesh>, &mu
             *material = ca.standard_material("door");
         }
         let mut camera_pos = global_transform.translation().clone();
-        camera_pos.y = 0.5;
-        *transform = Transform::from_xyz(thing.pos.x as f32 + 0.5, 0.5, thing.pos.y as f32 + 0.5)
+        camera_pos.y = 1.0;
+        *transform = Transform::from_xyz(thing.pos.x as f32 + 0.5, 1.0, thing.pos.y as f32 + 0.5)
         .looking_at(camera_pos, Vec3::Y);
-        //.looking_to(Vec3::new(1.0, 0.0, 0.0), Vec3::new(0.0, 1.0, 0.0));
+        //.looking_to(Vec3::new(0.0, 0.0, 1.0), Vec3::new(0.0, 1.0, 0.0));
 
         *entity_thing = thing.clone();
     }
