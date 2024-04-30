@@ -92,7 +92,7 @@ fn main() {
         })
         .insert_resource(ClearColor(Color::rgb(0.0, 0.0, 0.0)))
         .insert_resource(Client {
-            client: Mutex::new(Default::default()),
+            client: Mutex::new(netcode::client::Client::default().with_format(netcode::Format::Json)),
         })
         .insert_resource(ServerState::default())
         .insert_resource(CommonAssets::default())

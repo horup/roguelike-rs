@@ -1370,12 +1370,13 @@ dependencies = [
 [[package]]
 name = "client"
 version = "0.1.0"
-source = "git+https://github.com/horup/netcode-rs.git#6ae2fd2e202da9a5b4f6f72c1dc26c14caf2c571"
+source = "git+https://github.com/horup/netcode-rs.git#2b5d010751ed5bdda3c4d94ea9f6861d2ccca4a4"
 dependencies = [
  "bincode",
  "common",
  "ewebsock",
  "serde",
+ "serde_json",
 ]
 
 [[package]]
@@ -1444,7 +1445,7 @@ dependencies = [
 [[package]]
 name = "common"
 version = "0.1.0"
-source = "git+https://github.com/horup/netcode-rs.git#6ae2fd2e202da9a5b4f6f72c1dc26c14caf2c571"
+source = "git+https://github.com/horup/netcode-rs.git#2b5d010751ed5bdda3c4d94ea9f6861d2ccca4a4"
 dependencies = [
  "serde",
 ]
@@ -1925,9 +1926,9 @@ checksum = "0ce7134b9999ecaf8bcd65542e436736ef32ddca1b3e06094cb6ec5755203b80"
 
 [[package]]
 name = "flate2"
-version = "1.0.29"
+version = "1.0.30"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "4556222738635b7a3417ae6130d8f52201e45a0c4d1a907f0826383adb5f85e7"
+checksum = "5f54427cfd1c7829e2a139fcefea601bf088ebca651d2bf53ebc600eac295dae"
 dependencies = [
  "crc32fast",
  "miniz_oxide",
@@ -2673,9 +2674,9 @@ dependencies = [
 
 [[package]]
 name = "libc"
-version = "0.2.153"
+version = "0.2.154"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "9c198f91728a82281a64e1f4f9eeb25d82cb32a5de251c6bd1b5154d63a8e7bd"
+checksum = "ae743338b92ff9146ce83992f766a31066a91a8c84a45e0e9f21e7cf6de6d346"
 
 [[package]]
 name = "libflate"
@@ -2918,8 +2919,8 @@ dependencies = [
 
 [[package]]
 name = "netcode"
-version = "0.1.0"
-source = "git+https://github.com/horup/netcode-rs.git#6ae2fd2e202da9a5b4f6f72c1dc26c14caf2c571"
+version = "0.2.0"
+source = "git+https://github.com/horup/netcode-rs.git#2b5d010751ed5bdda3c4d94ea9f6861d2ccca4a4"
 dependencies = [
  "client 0.1.0 (git+https://github.com/horup/netcode-rs.git)",
  "common",
@@ -3664,7 +3665,7 @@ dependencies = [
 [[package]]
 name = "server"
 version = "0.1.0"
-source = "git+https://github.com/horup/netcode-rs.git#6ae2fd2e202da9a5b4f6f72c1dc26c14caf2c571"
+source = "git+https://github.com/horup/netcode-rs.git#2b5d010751ed5bdda3c4d94ea9f6861d2ccca4a4"
 dependencies = [
  "bincode",
  "common",
@@ -3674,6 +3675,7 @@ dependencies = [
  "hyper-tungstenite",
  "hyper-util",
  "noop-waker",
+ "serde_json",
  "tokio",
  "tokio-util",
 ]
@@ -3769,9 +3771,9 @@ dependencies = [
 
 [[package]]
 name = "socket2"
-version = "0.5.6"
+version = "0.5.7"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "05ffd9c0a93b7543e062e759284fcf5f5e3b098501104bfbdde4d404db792871"
+checksum = "ce305eb0b4296696835b71df73eb912e0f1ffd2556a501fcede6e0c50349191c"
 dependencies = [
  "libc",
  "windows-sys 0.52.0",

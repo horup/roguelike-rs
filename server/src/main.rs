@@ -91,7 +91,7 @@ async fn main() {
     load_map(&mut state.grid, &mut state.things);
     let port = 8080;
     info!("Starting server on port {}", port);
-    let mut server = Server::default() as Server<Message>;
+    let mut server:Server<Message> = Server::default().with_format(netcode::Format::Json);
     server.start(port).await;
     loop {
         for e in server.poll().iter() {
