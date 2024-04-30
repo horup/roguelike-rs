@@ -4,7 +4,6 @@ version = "0.1.0"
 edition = "2021"
 
 [dependencies]
-shared = {path = "../shared"}
 tokio.workspace = true
 netcode.workspace = true
 serde.workspace = true
