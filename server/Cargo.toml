@@ -14,3 +14,4 @@ uuid.workspace = true
 env_logger.workspace = true
 log.workspace = true
 glam.workspace = true
+ts-rs.workspace = true
