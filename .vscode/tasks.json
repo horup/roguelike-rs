@@ -5,7 +5,7 @@
 			"type": "cargo",
 			"command": "run",
 			"env": {
-				"RUST_LOG":"INFO"
+				"RUST_LOG": "INFO"
 			},
 			"args": [
 				"--bin",
@@ -16,5 +16,13 @@
 			],
 			"label": "run server"
 		},
+		{
+			"type": "npm",
+			"script": "start",
+			"path": "client",
+			"problemMatcher": [],
+			"label": "watch client",
+			"detail": "vite"
+		}
 	]
 }
