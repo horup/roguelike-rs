@@ -1,4 +1,5 @@
 import { Application, Sprite, Assets, Text, Texture, Container } from 'pixi.js';
+import * as PIXI from 'pixi.js';
 import { Message } from '../../server/bindings/Message';
 const app = new Application();
 
@@ -109,7 +110,7 @@ function update() {
 async function main() {
     // Wait for the Renderer to be available
     await app.init();
-    world.scale.set(16.0);
+    world.scale.set(32.0);
 
     // The application will create a canvas element for you that you
     // can then insert into the DOM
@@ -119,10 +120,16 @@ async function main() {
     //const texture = await Assets.load('assets/imgs/bunny.png');
 
     // This creates a texture from a 'bunny.png' image
-    textures["floor"] = await Assets.load('assets/imgs/floor.png');
-    textures["player"] = await Assets.load('assets/imgs/player.png');
-    textures["wall"] = await Assets.load('assets/imgs/wall.png');
-    textures["door"] = await Assets.load('assets/imgs/door.png');
+    let loadTexture = async (name:string, path:string) => {
+        let t = await Assets.load(path) as Texture;
+        textures[name] = t;
+        t.source.scaleMode = 'nearest';
+
+    }
+    loadTexture("floor", "assets/imgs/floor.png");
+    loadTexture("player", "assets/imgs/player.png");
+    loadTexture("wall", "assets/imgs/wall.png");
+    loadTexture("door", "assets/imgs/door.png");
 
     const text = new Text({
         text: 'Hello Pixi!',
