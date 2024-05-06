@@ -34,6 +34,7 @@ function sendMessage(msg:Message) {
 let world:Container = new Container();
 let textures = {} as {[key:string]:Texture}
 let tiles = {} as {[index:string]:Sprite}
+let things = {} as {[index:string]:Sprite}
 
 function update() {
     for (let ev of wsEvents) {
@@ -56,8 +57,6 @@ function update() {
                 let [x, y] = [tu.index[0], tu.index[1]];
                 let index = tu.index.toString();
                 if (tiles[index] == null) {
-                    let texture = tu.wall ? 'wall' : 'floor';
-                    let t = textures[texture];
                     const sprite = new Sprite();
                     sprite.x = x;
                     sprite.y = y;
@@ -70,6 +69,37 @@ function update() {
                 sprite.texture = t;
                 sprite.width = 1;
                 sprite.height = 1;
+            }
+            else if ('thingUpdate' in msg) {
+                let tu = msg.thingUpdate;
+                let id = tu.id.toString();
+                if (things[id] == null) {
+                    const sprite = new Sprite();
+                    world.addChild(sprite);
+                    things[id] = sprite;
+                }
+
+                let sprite = things[id];
+                if (tu.classes != null) {
+                    let texture = '';
+                    if (tu.classes.indexOf('player') != -1) {
+                        texture = 'player';
+                    }
+                    else if (tu.classes.indexOf('door') != -1) {
+                        texture = 'door';
+                    }
+                    let t = textures[texture];
+                    sprite.texture = t;
+                    sprite.width = 1;
+                    sprite.height = 1;
+                }
+
+                if (tu.x != null) {
+                    sprite.x = tu.x;
+                }
+                if (tu.y != null) {
+                    sprite.y = tu.y;
+                }
             }
         }
     }
@@ -93,19 +123,6 @@ async function main() {
     textures["player"] = await Assets.load('assets/imgs/player.png');
     textures["wall"] = await Assets.load('assets/imgs/wall.png');
     textures["door"] = await Assets.load('assets/imgs/door.png');
-    console.log(textures);
-    /*const bunny = new Sprite(texture);
-
-    // Setup the position of the bunny
-    bunny.x = app.renderer.width / 2;
-    bunny.y = app.renderer.height / 2;
-
-    // Rotate around the center
-    bunny.anchor.x = 0.5;
-    bunny.anchor.y = 0.5;
-
-    // Add the bunny to the scene we are building
-    app.stage.addChild(bunny);*/
 
     const text = new Text({
         text: 'Hello Pixi!',
