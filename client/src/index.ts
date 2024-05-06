@@ -9,7 +9,7 @@ interface WSEvent {
     msg?:Message;
 }
 let wsEvents = [] as WSEvent[]; 
-let socket:WebSocket = null;
+let socket:WebSocket | null = null;
 function openWebSocket() {
     if (socket != null) {
         socket.onopen = null;
@@ -29,7 +29,9 @@ function openWebSocket() {
     }
 }
 function sendMessage(msg:Message) {
-    socket.send(JSON.stringify(msg));
+    if (socket) {
+        socket.send(JSON.stringify(msg));
+    }
 }
 
 let world:Container = new Container();
