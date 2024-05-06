@@ -27,8 +27,9 @@
 ☐ implement pathfinding 
 ☐ implement pathfinding path rendering
 ☐ implement scroll to zoom
-☐ fix upside down sprite
-☐ decide if coordinate system should match server
+☐ implement camera movement for pixi
+✔ fix upside down sprite @done(24-05-06 14:19)
+✔ decide if coordinate system should match server @done(24-05-06 14:19)
 Archive:
   ✔ implement player spawning when joining @done(24-04-23 13:48)
   ✔ implement quick rendering of whole map @done(24-04-23 10:22)
